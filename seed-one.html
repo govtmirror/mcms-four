@@ -132,24 +132,11 @@ Example:
 
     </style>
 
-    <iron-ajax url="data/articles.json" auto last-response="{{articles}}"></iron-ajax>
 
-    <!-- setup routes -->
-    <carbon-location route="{{route}}" use-hash-as-path></carbon-location>
-    <carbon-route
-        route="{{route}}"
-        pattern="/:category"
-        data="{{categoryData}}"
-        tail="{{subRoute}}"></carbon-route>
-    <carbon-route
-        route="{{subRoute}}"
-        pattern="/:page"
-        data="{{pageData}}"
-        tail="{{subsubRoute}}"></carbon-route>
-    <carbon-route
-        route="{{subsubRoute}}"
-        pattern="/:title"
-        data="{{titleData}}"></carbon-route>
+    <firebase-collection
+        location="https://seed-one.firebaseio.com/articles"
+        data="{{articles}}">
+    </firebase-collection>
 
     <!-- manages page's scroll position -->
     <app-scrollpos-control
@@ -177,11 +164,11 @@ Example:
           <!-- nav menu -->
           <iron-selector
               class="nav-menu"
-              selected="[[categoryData.category]]"
+              selected="{{_pageName}}"
               attr-for-selected="name"
               on-iron-activate="_drawerSelected">
             <template is="dom-repeat" items="[[articles]]">
-              <a name="[[item.name]]" href="#/[[item.name]]/list">{{item.title}}</a>
+              <div name="{{item.name}}">{{item.title}}</div>
             </template>
           </iron-selector>
 
@@ -199,7 +186,8 @@ Example:
             <paper-icon-button
                 drawer-toggle
                 icon="app:menu"
-                hidden$="[[_equal(pageData.page, 'detail')]]"></paper-icon-button>
+                hidden$="[[_equal(pageData.page, 'detail')]]">
+            </paper-icon-button>
 
             <!-- back button -->
             <a
@@ -217,36 +205,15 @@ Example:
         </app-header>
 
         <!-- list/detail pages -->
-        <iron-pages selected="[[pageData.page]]" attr-for-selected="name">
+        <iron-pages selected="{{_pageName}}" attr-for-selected="name">
 
-          <!-- list page -->
-          <iron-pages name="list" selected="[[categoryData.category]]" attr-for-selected="name">
-
-            <template is="dom-repeat" items="[[articles]]" as="category">
-              <!-- category page (lazy-loaded) -->
-              <template is="dom-if" if="[[_equal(category, [[categoryData.category.name]])]]">
-                <section class="category-page" name="[[category.name]]">
-  
-                  <!-- 2-columns grid -->
-                  <two-columns-grid column-width="396" gutter="4">
-                    <template is="dom-repeat" items="[[category.items]]" as="article">
-                      <a
-                          is="article-headline"
-                          href="#/[[category.name]]/detail/[[article.title]]"
-                          article="[[article]]"></a>
-                    </template>
-                  </two-columns-grid>
-                  
-                </section>
-              </template>
-            </template>
-
-          </iron-pages>
-
-          <!-- detail page (lazy-loaded) -->
-          <template is="dom-if" if="[[_equal(pageData.page, 'detail')]]">
-            <article-detail name="detail" article="[[article]]"></article-detail>
-          </template>
+          <h1 name="topten">Top Ten</h1>
+          <h1 name="aday">yo aday</h1>
+          <h1 name="design">Design</h1>
+          <h1 name="film">Yo Film</h1>
+          <h1 name="photgraphy">Photos</h1>
+          <h1 name="art">Art Yo</h1>
+          <h1 name="home">HOME</h1>
 
         </iron-pages>
 
@@ -269,18 +236,29 @@ Example:
          */
         articles: Object,
 
-        route: Object,
+        _pageName: {
+          type: String,
+          value: "home",
+          notify: true,
+          observer: '_pageSelect'
+        },
 
-        subRoute: Object,
+        // route: Object,
 
-        subsubRoute: Object,
+        // subRoute: Object,
 
-        categoryData: Object,
+        // subsubRoute: Object,
+
+        categoryData: Array,
 
         pageData: Object,
 
         titleData: Object
 
+      },
+
+      _pageSelect: function () {
+        alert("yoho " + this._pageName);
       },
 
       observers: [
