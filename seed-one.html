@@ -27,34 +27,32 @@ Example:
 
       :host {
         /*--app-primary-color: #404040;*/
-        --app-primary-color: red;
+        --app-primary-color: var(--primary-background-color);
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
       }
+
       app-drawer {
         --app-drawer-content-container: {
-          background-color: var(--app-primary-color);
+          background-color: #fff;
           overflow-x: hidden;
         };
       }
       
       .main-header {
         border-bottom: 1px solid #ddd;
-        background-color: #fff;
-        color: #444;
+        background-color: var(--primary-color);
       }
 
       .title {
-        /*padding-bottom: 40px;*/
-        font-size: 60px;
-        font-weight: 800;
+        @apply(--paper-font-display2);
+        color: #fff;
       }
      
-      
       @media (max-width: 580px) {
         /* make title smaller to fit on screen */
         .title {
-          font-size: 40px;
-          padding-bottom: 16px;
+          @apply(--paper-font-headline);
+          color: #fff;
         }
       }
 
@@ -96,19 +94,22 @@ Example:
             </paper-icon-button>
           <!-- </app-toolbar>
           <app-toolbar> -->
+            <!-- <div class="title">Application Title</div> -->
             <div class="title">Application Title</div>
           </app-toolbar>
         </app-header>
 
-        <!-- list/detail pages -->
-        <iron-pages selected="{{_pageName}}" attr-for-selected="name">
-          <template is="dom-repeat" items="{{menuItems}}">
-            <div name="{{item.name}}">
-              <h3>{{item.title}}</h3>
-              <div>{{item.desc}}</div>
-            </div>
-          </template>
-        </iron-pages>
+        <!-- content -->
+        <div>
+          <iron-pages selected="{{_pageName}}" attr-for-selected="name">
+            <template is="dom-repeat" items="{{menuItems}}">
+              <div name="{{item.name}}">
+                <h3>{{item.title}}</h3>
+                <div>{{item.desc}}</div>
+              </div>
+            </template>
+          </iron-pages>
+        </div>
 
       </app-header-layout>
 
