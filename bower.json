@@ -1,5 +1,5 @@
 {
-  "name": "seed-one",
+  "name": "mcms-four",
   "version": "1.0.6",
   "authors": [
     "Anonymous <anonymous@example.com>"
@@ -10,15 +10,16 @@
     "polymer",
     "seed"
   ],
-  "main": "seed-one.html",
+  "main": "mcms-four.html",
   "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/<USERNAME>/seed-one/",
+  "homepage": "https://github.com/<USERNAME>/mcms-four/",
   "ignore": [
     "/.*",
     "/test/"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
+    "aws-home": "NMB-Dev/aws-home#~0.1.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-icon": "PolymerElements/iron-icon#^1.0.0",
     "iron-iconset": "PolymerElements/iron-iconset#^1.0.0",

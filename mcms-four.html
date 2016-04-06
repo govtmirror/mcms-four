@@ -10,17 +10,17 @@ An element providing a solution to layout scaffolding.
 
 Example:
 
-    <seed-one></seed-one>
+    <mcms-four></mcms-four>
 
 Example:
 
-    <seed-one>
-    </seed-one>
+    <mcms-four>
+    </mcms-four>
 
 @demo demo/index.html
 -->
 
-<dom-module id="seed-one">
+<dom-module id="mcms-four">
   <template>
 
     <style>
@@ -51,7 +51,7 @@ Example:
       .maincontent {
         width:100%;
         height: 100%;
-        background-color: var(--light-accent-color);
+        background-color: var(--primary-background-color);
       }
      
       @media (max-width: 580px) {
@@ -64,6 +64,13 @@ Example:
 
 
     </style>
+
+    <mcms-viewdata
+        id="datafacade"
+        medcases="{{medCases}}"
+        selected-case="{{selectedCase}}"
+        selected-activities="{{selectedActivities}}">
+    </mcms-viewdata>
 
     <!-- manages page's scroll position -->
     <app-scrollpos-control
@@ -101,19 +108,21 @@ Example:
           <!-- </app-toolbar>
           <app-toolbar> -->
             <!-- <div class="title">Application Title</div> -->
-            <div class="title">Application Title</div>
+            <div class="title">{{appTitle}}</div>
           </app-toolbar>
         </app-header>
 
         <!-- content -->
         <div class="maincontent">
           <iron-pages selected="{{_pageName}}" attr-for-selected="name">
-            <template is="dom-repeat" items="{{menuItems}}">
-              <div name="{{item.name}}">
-                <h3>{{item.title}}</h3>
-                <div>{{item.desc}}</div>
-              </div>
-            </template>
+            <aws-home name="home"></aws-home>
+            <mcms-info
+                name="cases"
+                medcases="{{medCases}}"
+                selected-activities="{{selectedActivities}}"
+                selected-case="{{selectedCase}}">
+            </mcms-info>
+            <mcms-reportsummary name="reports"></mcms-reportsummary>
           </iron-pages>
         </div>
 
@@ -127,9 +136,16 @@ Example:
 
     Polymer({
 
-      is: 'seed-one',
+      is: 'mcms-four',
 
       properties: {
+
+        appTitle: String,
+
+        dataUrl: {
+          type: String,
+          value: "https://medcsmgt.firebaseio.com"
+        },
 
         _pageName: {
           type: String,
@@ -140,11 +156,9 @@ Example:
           type: Array,
           value: function () {
             return [
-              {'name':'charlie', 'title':'Charlie Montague', 'desc': 'director of the NMB ICT staff'},
-              {'name':'dean', 'title':'Dean Wagner', 'desc': 'Information System Security Officer'},
-              {'name':'tim', 'title':'Tim Strickler', 'desc': 'Support extrodinair'},
-              {'name':'dan', 'title':'Dan Rainey', 'desc': 'The best Chief of staff'},
-              {'name':'april', 'title':'April Dawson', 'desc': 'reliable office mate'}
+              {'name':'home', 'title':'Home'},
+              {'name':'cases', 'title':'Cases'},
+              {'name':'reports', 'title':'Reports'}
             ];
           }
         }
@@ -152,7 +166,10 @@ Example:
       },
 
       ready: function() {
-
+        this.addEventListener('case-selected', function(event) {
+          this.$.datafacade.setSelectedCaseUrl(event.detail.caseId);
+          // alert("case-selected event, " + event.detail.caseId);
+        });
       },
 
       _drawerSelected: function() {

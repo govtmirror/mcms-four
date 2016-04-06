@@ -1,0 +1,47 @@
+<!--
+@license
+Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
+-->
+
+<dom-module id="mcms-casedetail">
+
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      font-size: 14px;
+      padding: 24px;
+      background-color: gray;
+      margin: 10px;
+      border-radius: 10px;
+      color: white;
+    }
+  </style>
+
+  <template>
+    <h1>Case Detail</h1>
+    <h2>{{selectedCase.caseID}}</h2>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'mcms-casedetail',
+
+      properties: {
+
+        selectedCase: {
+          type: Object,
+          value: function () {
+            return {};
+          }
+        }
+
+      }
+
+    });
+
+  </script>
+</dom-module>

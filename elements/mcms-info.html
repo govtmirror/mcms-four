@@ -1,0 +1,63 @@
+<!--
+@license
+Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
+-->
+
+<dom-module id="mcms-info">
+
+	<style>
+		:host {
+			display: block;
+			box-sizing: border-box;
+		}
+
+		.mainlayout {
+			@apply(--layout-horizontal);
+		}
+
+		.flexchild {
+			@apply(--layout-flex);
+		}
+
+		.tall400 {
+			height: 300px;
+		}
+
+	</style>
+
+	<template>
+		<div class="mainlayout">
+			<div>
+				<mcms-caseselector></mcms-caseselector>
+				<mcms-caselist
+						class="tall400"
+						caselist="{{medcases}}">
+				</mcms-caselist>
+			</div>
+			<div class="flexchild">
+				<mcms-casedetail
+						selected-case="{{selectedCase}}">
+				</mcms-casedetail>
+				<mcms-activitylist></mcms-activitylist>
+			</div>
+		</div>
+		
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'mcms-info',
+
+			properties: {
+				medcases: Array,
+				selectedCase: Object
+			}
+
+
+		});
+
+	</script>
+
+</dom-module>

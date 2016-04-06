@@ -1,0 +1,64 @@
+<!--
+@license
+Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
+-->
+
+<dom-module id="mcms-viewdata">
+
+	<template>
+		<firebase-collection
+	        location="{{_medcasePath}}"
+	        data="{{medcases}}">
+	    </firebase-collection>
+	    <firebase-document
+	        location="{{_selectedCaseUrl}}"
+	        data="{{selectedCase}}">
+	    </firebase-document>
+	    
+	</template>
+
+	<script>
+		Polymer({
+
+			is: 'mcms-viewdata',
+
+			properties: {
+
+				medcases: {
+					type: Array,
+					notify: true,
+					value: function () {
+						return [];
+					}
+				},
+		
+				selectedCaseId: String,
+				_selectedCaseUrl: {
+					type: String,
+					value: null
+				},
+				selectedCase: {
+					type: Object,
+					notify: true,
+				}
+
+			},
+
+			ready: function () {
+				this._medcasePath = "https://medcsmgt.firebaseIO.com/medcases";
+				//this._selectedCaseUrl = "https://medcsmgt.firebaseIO.com/medcases/A-13761";
+			},
+
+
+			setSelectedCaseUrl: function (caseId) {
+				this.selectedCaseId = caseId;
+				this._selectedCaseUrl = this._medcasePath + "/" + caseId;
+				// alert(this.selectedCaseId);
+			},
+ 
+
+		});
+
+	</script>
+
+</dom-module>

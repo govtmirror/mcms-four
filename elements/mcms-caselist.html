@@ -1,0 +1,88 @@
+<!--
+@license
+Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
+-->
+
+<dom-module id="mcms-caselist">
+
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      font-size: 14px;
+      background-color: #eee;
+      color: black;
+      padding:10px;
+    }
+    .caseitem {
+      border-radius: 10px;
+      padding: 10px;
+      margin:5px;
+      background-color: white;
+      color: black;
+    }
+    .caseselected {
+      background-color: pink;
+      color: white;
+    }
+    #list {
+      width: 300px;
+      background-color: grey;
+      color: white;
+      padding:10px;
+      border-radius: 10px;
+    }
+
+  </style>
+
+  <template>
+    <section id="list">
+      <h2>Mediation Case List</h2>
+      <template is="dom-repeat" items="{{caselist}}">
+        <div on-tap="_itemtap" class="caseitem">
+          {{item.caseID}}
+        </div>
+      </template>
+    </section>
+    <section>
+      <h1>{{selectedCase.caseID}}</h1>
+    </section>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'mcms-caselist',
+
+      properties: {
+        caselist: {
+          type: Array,
+          value: function () {
+            return [];
+          }
+        }
+      },
+
+      // Element Behavior
+
+      _itemtap: function (event) {
+        try {
+          this.toggleClass('caseselected', false, this.$$('.caseselected'));
+        } 
+        catch(err) {
+          console.log("no caseselected");
+        }
+        if (event.target.nodeName != "DIV") {
+          this.toggleClass('caseselected', true, event.target.parentNode);
+        } else {
+          this.toggleClass('caseselected', true, event.target);
+        }
+        this.fire('case-selected', {"caseId": event.model.item.__firebaseKey__});
+      }
+
+    });
+
+  </script>
+</dom-module>
