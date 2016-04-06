@@ -10,6 +10,10 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 	        location="{{_medcasePath}}"
 	        data="{{medcases}}">
 	    </firebase-collection>
+	    <firebase-collection
+	        location="{{_activitiesPath}}"
+	        data="{{selectedActivities}}">
+	    </firebase-collection>
 	    <firebase-document
 	        location="{{_selectedCaseUrl}}"
 	        data="{{selectedCase}}">
@@ -40,13 +44,21 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 				selectedCase: {
 					type: Object,
 					notify: true,
+				},
+
+				selectedActivities: {
+					type: Array,
+					notify: true,
+					value: function () {
+						return [];
+					}
 				}
 
 			},
 
 			ready: function () {
 				this._medcasePath = "https://medcsmgt.firebaseIO.com/medcases";
-				//this._selectedCaseUrl = "https://medcsmgt.firebaseIO.com/medcases/A-13761";
+				this._activitiesPath = "https://medcsmgt.firebaseIO.com/activities";
 			},
 
 
@@ -54,7 +66,7 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 				this.selectedCaseId = caseId;
 				this._selectedCaseUrl = this._medcasePath + "/" + caseId;
 				// alert(this.selectedCaseId);
-			},
+			}
  
 
 		});

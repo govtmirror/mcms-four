@@ -15,22 +15,33 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 			@apply(--layout-horizontal);
 		}
 
+		.leftside {
+			@apply(--layout-vertical);
+			width:250px;
+		}
+
 		.flexchild {
 			@apply(--layout-flex);
 		}
 
-		.tall400 {
-			height: 300px;
+		@media (max-width: 580px) {
+			.mainlayout {
+				@apply(--layout-vertical);
+			}
+			.leftside {
+				width:100%;
+			}
+
 		}
+
+
 
 	</style>
 
 	<template>
 		<div class="mainlayout">
-			<div>
-				<mcms-caseselector></mcms-caseselector>
+			<div class="leftside">
 				<mcms-caselist
-						class="tall400"
 						caselist="{{medcases}}">
 				</mcms-caselist>
 			</div>
@@ -38,7 +49,9 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 				<mcms-casedetail
 						selected-case="{{selectedCase}}">
 				</mcms-casedetail>
-				<mcms-activitylist></mcms-activitylist>
+				<mcms-activitylist
+						selected-activities="{{selectedActivities}}">
+				</mcms-activitylist>
 			</div>
 		</div>
 		
@@ -52,7 +65,8 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 
 			properties: {
 				medcases: Array,
-				selectedCase: Object
+				selectedCase: Object,
+				selectedActivities: Array
 			}
 
 

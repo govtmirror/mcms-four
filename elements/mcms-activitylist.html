@@ -21,6 +21,9 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 
   <template>
     <h1>Activity List</h1>
+    <template is="dom-repeat" items="{{selectedActivities}}">
+      <p>yo: {{item.__firebaseKey__}}</p>
+    </template>
   </template>
 
   <script>
@@ -29,7 +32,9 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 
       is: 'mcms-activitylist',
 
-      properties: {}
+      properties: {
+        selectedActivities: Array
+      }
 
     });
 

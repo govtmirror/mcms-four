@@ -14,6 +14,7 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       background-color: #eee;
       color: black;
       padding:10px;
+      /*height: 75vh;*/
     }
     .caseitem {
       border-radius: 10px;
@@ -26,28 +27,32 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       background-color: pink;
       color: white;
     }
-    #list {
-      width: 300px;
-      background-color: grey;
-      color: white;
-      padding:10px;
-      border-radius: 10px;
+   
+    .aaaa {
+      height:85vh;
     }
 
   </style>
 
   <template>
-    <section id="list">
-      <h2>Mediation Case List</h2>
-      <template is="dom-repeat" items="{{caselist}}">
-        <div on-tap="_itemtap" class="caseitem">
-          {{item.caseID}}
-        </div>
-      </template>
-    </section>
-    <section>
-      <h1>{{selectedCase.caseID}}</h1>
-    </section>
+
+  <div class="aaaa">
+    <paper-header-panel mode="waterfall">
+      <div>
+        <paper-input label="Case number:" always-float-label></paper-input>
+        <paper-input label="NMB member:" always-float-label></paper-input>
+        <paper-input label="Carrier or Organization:" always-float-label></paper-input>
+      </div>
+      <div class="fit">
+        <template is="dom-repeat" items="{{caselist}}">
+          <div on-tap="_itemtap" class="caseitem">
+            {{item.caseID}}
+          </div>
+        </template>
+      </div>
+    </paper-header-panel>
+  </div>
+
   </template>
 
   <script>
