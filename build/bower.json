@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
-    "mcms-four": "NMB-Dev/aws-home#~0.0.1"
+    "mcms-four": "NMB-Dev/mcms-four#~0.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
