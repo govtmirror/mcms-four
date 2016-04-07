@@ -37,14 +37,18 @@ Example:
           overflow-x: hidden;
         };
       }
+
       
       .main-header {
         border-bottom: 1px solid #ddd;
+        color:var(--dark-theme-text-color);
         background-color: var(--primary-color);
       }
 
       .title {
         @apply(--paper-font-display2);
+        @apply(--layout-flex);
+        text-align: center;
         color: #fff;
       }
 
@@ -58,6 +62,8 @@ Example:
         /* make title smaller to fit on screen */
         .title {
           @apply(--paper-font-headline);
+          @apply(--layout-flex);
+          text-align: center;
           color: #fff;
         }
       }
@@ -81,6 +87,7 @@ Example:
 
       <!-- nav panel -->
       <app-drawer id="drawer">
+        <!-- just a spacer -->
         <app-toolbar></app-toolbar>
         <!-- nav menu -->
         <paper-menu 
@@ -109,6 +116,10 @@ Example:
           <app-toolbar> -->
             <!-- <div class="title">Application Title</div> -->
             <div class="title">{{appTitle}}</div>
+            <paper-icon-button
+                icon="account-circle"
+                on-tap="loginBtn">
+            </paper-icon-button>
           </app-toolbar>
         </app-header>
 
@@ -176,6 +187,10 @@ Example:
 
       _drawerSelected: function() {
         if (!this.$.drawer.persistent) this.$.drawer.close();
+      },
+
+      loginBtn: function () {
+        alert("Are you wondering about login?");
       }
 
     });
