@@ -22,7 +22,33 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
   <template>
     <h1>Activity List</h1>
     <template is="dom-repeat" items="{{selectedActivities}}">
-      <p>yo: {{item.__firebaseKey__}}</p>
+
+
+
+
+      <div>
+        <h4>{{item.activityType}} dated {{item.activityDate}}</h4> 
+        <hr>
+        <div>reported by {{item.author}} on {{item.timeStamp}}</div>
+        <br>
+        <div>{{item.actComment}}</div>
+        <div>{{item.notes}}</div>
+        <br>
+        <div id="meta" hidden vertical layout>
+          <span>Report Type:  {{item.reportType}}</span>
+          <span>Start Date: {{item.activityDate}}</span>
+          <span>End Date: {{item.endDate}}</span>
+          <span>Days: {{item.mediationDays}}</span>
+          <span>Carrier Reps: {{item.carrierReps}}</span>
+          <span>Organization Reps: {{item.orgReps}}</span>
+          <span>Location: {{item.location}}</span><br>
+          <span>Management Plan: {{item.managementPlan}}</span>
+          <br>  
+        </div>
+      </div>
+
+
+
     </template>
   </template>
 

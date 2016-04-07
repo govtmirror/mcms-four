@@ -24,7 +24,7 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       color: black;
     }
     .caseselected {
-      background-color: pink;
+      background-color: var(--paper-pink-a200);
       color: white;
     }
    
@@ -35,23 +35,24 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
   </style>
 
   <template>
-
-  <div class="aaaa">
-    <paper-header-panel mode="waterfall">
-      <div>
-        <paper-input label="Case number:" always-float-label></paper-input>
-        <paper-input label="NMB member:" always-float-label></paper-input>
-        <paper-input label="Carrier or Organization:" always-float-label></paper-input>
-      </div>
-      <div class="fit">
-        <template is="dom-repeat" items="{{caselist}}">
-          <div on-tap="_itemtap" class="caseitem">
-            {{item.caseID}}
-          </div>
-        </template>
-      </div>
-    </paper-header-panel>
-  </div>
+    
+    <div class="aaaa">
+      <paper-header-panel mode="waterfall">
+        <div>
+          <paper-input label="Case number:" always-float-label></paper-input>
+          <paper-input label="NMB member:" always-float-label></paper-input>
+          <paper-input label="Carrier or Organization:" always-float-label></paper-input>
+        </div>
+        <div class="fit">
+          <template is="dom-repeat" items="{{caselist}}">
+            <div on-tap="_itemtap" class="caseitem">
+              {{item.caseID}}
+            </div>
+          </template>
+        </div>
+      </paper-header-panel>
+    </div>
+  
 
   </template>
 
