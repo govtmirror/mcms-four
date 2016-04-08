@@ -147,6 +147,17 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         this.$.medcaselist.render();
       },
 
+      // utilities
+      
+      dateConvert: function (stringint) {
+        if (stringint != "" && stringint != null){
+          var d = new Date(parseInt(stringint));
+          return d.toLocaleDateString();
+        } else {
+          return "n/a";
+        }
+      },
+
       isDisplay: function (item) {
         // console.log("display results = " + 
         //   this._getState(item) + ", " + 

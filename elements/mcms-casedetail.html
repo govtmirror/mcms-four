@@ -14,6 +14,7 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
       margin: 10px;
       border-radius: 10px;
     }
+
     td {
       @apply(--paper-font-body2);
       background-color: var(--light-theme-background-color);
@@ -24,6 +25,20 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
       border-style: solid;
     }
 
+    .rightshift {
+      text-align: right;
+      min-width: 150px;
+    }
+
+    .headerbox {
+      @apply(--paper-font-body1);
+      padding: 10px;
+      background-color: var(--light-theme-background-color);
+      margin-bottom: 10px;
+      border-radius: 10px;
+      max-width: 300px;
+    }
+
     .caseheader {
       @apply(--paper-font-title);
     }
@@ -31,21 +46,22 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
   </style>
 
   <template>
-
-      <span class="caseheader">{{selectedCase.caseID}} {{selectedCase.caseSuffix}}</span><br>
-      <span class="caseheader">{{selectedCase.orgs}} - {{selectedCase.carriers}}</span><br>
-      <span class="caseheader">{{selectedCase.crafts}} - {{selectedCase.numberOfEmployees}} emp.</span>
+      <div class="headerbox">
+        <div class="caseheader">{{selectedCase.caseID}} {{selectedCase.caseSuffix}}</div>
+        <div>{{selectedCase.orgs}} - {{selectedCase.carriers}}</div>
+        <div>{{selectedCase.crafts}} - {{selectedCase.numberOfEmployees}} emp.</div>
+      </div>
       <table>
-        <tr><td>Status</td><td>{{selectedCase.caseState}}</td></tr>
-        <tr><td>Docket</td><td>{{selectedCase.docketDate}}</td></tr>
-        <tr><td>Cumm. Days</td><td>{{selectedCase.cummDays}}</td></tr>
-        <tr><td>Amedable Date</td><td>{{selectedCase.amendableDate}}</td></tr>
-        <tr><td>Scheduled</td><td>{{selectedCase.scheduledDate}}</td></tr>
-        <tr><td>TA Date</td><td>{{selectedCase.taDate}}</td></tr>
-        <tr><td>Ratified</td><td>{{selectedCase.ratifyDate}}</td></tr>
-        <tr><td>New A. Date</td><td>{{selectedCase.newAmendableDate}}</td></tr>
-        <tr><td>Closed</td><td>{{selectedCase.closedDate}}</td></tr>
-        <tr><td>Closure Reason</td><td>{{selectedCase.closureReason}}</td></tr>
+        <tr><td>Status</td><td class="rightshift">{{selectedCase.caseState}}</td></tr>
+        <tr><td>Docket</td><td class="rightshift">[[dateConvert(selectedCase.docketDate)]]</td></tr>
+        <tr><td>Cumm. Days</td><td class="rightshift">{{selectedCase.cummDays}}</td></tr>
+        <tr><td>Amedable Date</td><td class="rightshift">[[dateConvert(selectedCase.amendableDate)]]</td></tr>
+        <tr><td>Scheduled</td><td class="rightshift">[[dateConvert(selectedCase.scheduledDate)]]</td></tr>
+        <tr><td>TA Date</td><td class="rightshift">[[dateConvert(selectedCase.taDate)]]</td></tr>
+        <tr><td>Ratified</td><td class="rightshift">[[dateConvert(selectedCase.ratifyDate)]]</td></tr>
+        <tr><td>New A. Date</td><td class="rightshift">[[dateConvert(selectedCase.newAmendableDate)]]</td></tr>
+        <tr><td>Closed</td><td class="rightshift">[[dateConvert(selectedCase.closedDate)]]</td></tr>
+        <tr><td>Closure Reason</td><td class="rightshift">{{selectedCase.closureReason}}</td></tr>
       </table>
 
 
@@ -65,7 +81,18 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
             return {};
           }
         }
-      }
+      },
+
+      // utilities
+      
+      dateConvert: function (stringint) {
+        if (stringint != "" && stringint != null){
+          var d = new Date(parseInt(stringint));
+          return d.toLocaleDateString();
+        } else {
+          return "n/a";
+        }
+      },
 
     });
 
