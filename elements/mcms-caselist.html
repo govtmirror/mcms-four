@@ -90,17 +90,20 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         }
         //  make the comparison to existing selected case
         var cid = event.model.item.__firebaseKey__;
-        var yoState = true;
-        if (cid == this.selectedCase.caseID) {
-          yoState = false;
+        var isNewCase = true;
+        if (this.selectedCase != null && cid == this.selectedCase.caseID ) {
+          isNewCase = false;
         }
         //  set or not the case selected class
         if (event.target.nodeName != "DIV") {
-          this.toggleClass('caseselected', yoState, event.target.parentNode);
+          this.toggleClass('caseselected', isNewCase, event.target.parentNode);
         } else {
-          this.toggleClass('caseselected', yoState, event.target);
+          this.toggleClass('caseselected', isNewCase, event.target);
         }
-        this.fire('case-selected', {"caseId": event.model.item.__firebaseKey__});
+        this.fire('case-selected', {
+          "caseId": event.model.item.__firebaseKey__,
+          "isNewCase": isNewCase
+        });
       }
 
     });

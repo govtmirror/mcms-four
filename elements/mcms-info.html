@@ -74,7 +74,11 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 
 			ready: function () {
 				this.addEventListener('case-selected', function(event) {
-					this.$.stuff.show()
+					if (event.detail.isNewCase) {
+						this.$.stuff.show()
+					} else {
+						this.$.stuff.hide()
+					}
 				});
 			}
 		});
