@@ -63,9 +63,16 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 
 
 			setSelectedCaseUrl: function (caseId) {
-				this.selectedCaseId = caseId;
-				this._selectedCaseUrl = this._medcasePath + "/" + caseId;
-				// alert(this.selectedCaseId);
+				if (this.selectedCaseId != caseId) {
+					this.selectedCaseId = caseId;
+					this._selectedCaseUrl = this._medcasePath + "/" + caseId;
+				} else {
+					this.selectedCaseId = null;
+					this._selectedCaseUrl = this._medcasePath + "/A-00000";
+				}
+				
+				alert(this.selectedCase.caseID + ", " + this._selectedCaseUrl);
+
 			}
  
 

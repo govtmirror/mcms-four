@@ -68,22 +68,37 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           value: function () {
             return [];
           }
+        },
+        selectedCase: {
+          type: Object,
+          value: function () {
+            return {};
+          }
         }
       },
+      
 
       // Element Behavior
 
       _itemtap: function (event) {
+        // remove caseselected class from all elements
         try {
           this.toggleClass('caseselected', false, this.$$('.caseselected'));
         } 
         catch(err) {
           console.log("no caseselected");
         }
+        //  make the comparison to existing selected case
+        var cid = event.model.item.__firebaseKey__;
+        var yoState = true;
+        if (cid == this.selectedCase.caseID) {
+          yoState = false;
+        }
+        //  set or not the case selected class
         if (event.target.nodeName != "DIV") {
-          this.toggleClass('caseselected', true, event.target.parentNode);
+          this.toggleClass('caseselected', yoState, event.target.parentNode);
         } else {
-          this.toggleClass('caseselected', true, event.target);
+          this.toggleClass('caseselected', yoState, event.target);
         }
         this.fire('case-selected', {"caseId": event.model.item.__firebaseKey__});
       }
