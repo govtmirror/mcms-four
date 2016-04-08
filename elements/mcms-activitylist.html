@@ -21,10 +21,10 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 
   <template>
     <h1>Activity List</h1>
-    <template is="dom-repeat" items="{{selectedActivities}}">
-
-
-
+    <template is="dom-repeat" 
+        items="{{selectedActivities}}"
+        filter="_isDisplay"
+        id="actlist">
 
       <div>
         <h4>{{item.activityType}} dated {{item.activityDate}}</h4> 
@@ -59,7 +59,37 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
       is: 'mcms-activitylist',
 
       properties: {
-        selectedActivities: Array
+        selectedActivities: Array,
+        selectedCase: {
+          type: Object,
+          value: function () {
+            return {};
+          }
+        }
+      },
+
+      _isDisplay: function (item) {
+        return true;
+      },
+
+      _hasCase: function (item) {
+        var teststring = this.selectedCase.caseID;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.cases;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return false;
+        }  
       }
 
     });
