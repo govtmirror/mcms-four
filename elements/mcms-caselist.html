@@ -58,16 +58,23 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           <paper-input 
               id="casetest"
               label="Case number:" 
-              always-float-label
+              
               on-change="_doListSort">
           </paper-input>
           <paper-input 
+              id="membertest"
               label="NMB member:" 
-              always-float-label>
+              on-change="_doListSort">
           </paper-input>
           <paper-input 
-              label="Carrier or Organization:" 
-              always-float-label>
+              id="carriertest"
+              label="Carrier:" 
+              on-change="_doListSort">
+          </paper-input>
+          <paper-input 
+              id="orgtest"
+              label="Organization:" 
+              on-change="_doListSort">
           </paper-input>
         </div>
         <div class="fit">
@@ -141,7 +148,15 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       },
 
       isDisplay: function (item) {
-        return this._getState(item) && this._caseStartsWith(item);
+        // console.log("display results = " + 
+        //   this._getState(item) + ", " + 
+        //   this._caseStartsWith(item) + ", " + 
+        //   this._hasMember(item)) ;
+        return this._getState(item) && 
+               this._caseStartsWith(item) &&
+               this._hasMember(item) &&
+               this._hasCarrier(item) &&
+               this._hasOrg(item);
       },
       
       _getState: function (item) {
@@ -156,6 +171,66 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         var teststring = this.$.casetest.value;
         if (teststring) {
           return item.caseID.startsWith(teststring);
+        } else {
+          return true;
+        }  
+      },
+
+      _hasMember: function (item) {
+        var teststring = this.$.membertest.value;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.nmbMembers;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].name.startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return true;
+        }  
+      },
+
+      _hasCarrier: function (item) {
+        var teststring = this.$.carriertest.value;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.carriers;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return true;
+        }  
+      },
+
+      _hasOrg: function (item) {
+        var teststring = this.$.orgtest.value;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.orgs;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
         } else {
           return true;
         }  
