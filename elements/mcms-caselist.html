@@ -39,12 +39,42 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
     <div class="aaaa">
       <paper-header-panel mode="waterfall">
         <div>
-          <paper-input label="Case number:" always-float-label></paper-input>
-          <paper-input label="NMB member:" always-float-label></paper-input>
-          <paper-input label="Carrier or Organization:" always-float-label></paper-input>
+          <paper-radio-button 
+              checked
+              id="getOpen" 
+              on-change="_doListSort">
+            Open
+          </paper-radio-button>
+          <paper-radio-button 
+              id="getTaed"
+              on-change="_doListSort">
+            Ta'ed
+          </paper-radio-button>
+          <paper-radio-button 
+              id="getClosed"
+              on-change="_doListSort">
+            Closed
+          </paper-radio-button>
+          <paper-input 
+              id="casetest"
+              label="Case number:" 
+              always-float-label
+              on-change="_doListSort">
+          </paper-input>
+          <paper-input 
+              label="NMB member:" 
+              always-float-label>
+          </paper-input>
+          <paper-input 
+              label="Carrier or Organization:" 
+              always-float-label>
+          </paper-input>
         </div>
         <div class="fit">
-          <template is="dom-repeat" items="{{caselist}}">
+          <template is="dom-repeat" 
+              id="medcaselist"
+              items="{{caselist}}"
+              filter="isDisplay">
             <div on-tap="_itemtap" class="caseitem">
               {{item.caseID}}
             </div>
@@ -104,7 +134,33 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           "caseId": event.model.item.__firebaseKey__,
           "isNewCase": isNewCase
         });
+      },
+
+      _doListSort: function () {
+        this.$.medcaselist.render();
+      },
+
+      isDisplay: function (item) {
+        return this._getState(item) && this._caseStartsWith(item);
+      },
+      
+      _getState: function (item) {
+        return (
+          (item.caseState == "open" && this.$.getOpen.checked) ||
+          (item.caseState == "closed" && this.$.getClosed.checked) ||
+          (item.caseState == "taed" && this.$.getTaed.checked)
+        );
+      },
+
+      _caseStartsWith: function (item) {
+        var teststring = this.$.casetest.value;
+        if (teststring) {
+          return item.caseID.startsWith(teststring);
+        } else {
+          return true;
+        }  
       }
+
 
     });
 
