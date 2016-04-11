@@ -13,12 +13,13 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       font-size: 14px;
       background-color: #eee;
       color: black;
-      padding:10px;
+      /*padding:10px;*/
       /*height: 75vh;*/
     }
 
     .flex-horizontal {
       @apply(--layout-horizontal);
+      @apply(--layout-center);
     }
     .flexchild {
       @apply(--layout-flex);
@@ -28,8 +29,12 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       border-radius: 10px;
       padding: 10px;
       margin:5px;
-      background-color: white;
+      background-color: var(--primary-background-color);
       color: black;
+    }
+    .listhead {
+      background-color: var(--light-primary-color);
+      padding:10px;
     }
     .caseselected {
       background-color: var(--paper-pink-a200);
@@ -45,56 +50,60 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
   <template>
     
     <div class="aaaa">
-      <paper-header-panel mode="waterfall">
-        <div>
+      <paper-header-panel 
+          mode="waterfall">
+        <div class="listhead">
           <div class="flex-horizontal">
             <paper-icon-button
-                icon="add">
+                icon="{{_toggleState}}"
+                on-tap="_doSearchToggle">
             </paper-icon-button>
-            <div class="flexchild"></div>
-            <paper-icon-button
-                icon="search">
-            </paper-icon-button>
-            <paper-icon-button
-                icon="clear">
-            </paper-icon-button>
+            <div class="flexchild">Search Form</div>
+
+            
           </div>
-          <paper-radio-button 
-              id="getOpen" 
-              on-change="_doListSort">
-            Open
-          </paper-radio-button>
-          <paper-radio-button 
-              id="getTaed"
-              on-change="_doListSort">
-            Ta'ed
-          </paper-radio-button>
-          <paper-radio-button 
-              id="getClosed"
-              on-change="_doListSort">
-            Closed
-          </paper-radio-button>
-          <paper-input 
-              id="casetest"
-              label="Case number:" 
-              
-              on-change="_doListSort">
-          </paper-input>
-          <paper-input 
-              id="membertest"
-              label="NMB member:" 
-              on-change="_doListSort">
-          </paper-input>
-          <paper-input 
-              id="carriertest"
-              label="Carrier:" 
-              on-change="_doListSort">
-          </paper-input>
-          <paper-input 
-              id="orgtest"
-              label="Organization:" 
-              on-change="_doListSort">
-          </paper-input>
+          <iron-collapse id="searchform">
+            <hr>
+            <paper-radio-button 
+                id="getOpen" >
+              Open
+            </paper-radio-button>
+            <paper-radio-button 
+                id="getTaed">
+              Ta'ed
+            </paper-radio-button>
+            <paper-radio-button 
+                id="getClosed">
+              Closed
+            </paper-radio-button>
+            <paper-input 
+                id="casetest"
+                label="Case number:" >
+            </paper-input>
+            <paper-input 
+                id="membertest"
+                label="NMB member:">
+            </paper-input>
+            <paper-input 
+                id="carriertest"
+                label="Carrier:">
+            </paper-input>
+            <paper-input 
+                id="orgtest"
+                label="Organization:">
+            </paper-input>
+            <div class="flex-horizontal">
+              <div class="flexchild"></div>
+              <paper-icon-button
+                  icon="search"
+                  on-tap="_doListSort">
+              </paper-icon-button>
+              <paper-icon-button
+                  icon="clear"
+                  on-tap="_doClearList">
+              </paper-icon-button>
+            </div>
+          </iron-collapse>
         </div>
         <div class="fit">
           <template is="dom-repeat" 
@@ -102,7 +111,12 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
               items="{{caselist}}"
               filter="isDisplay">
             <div on-tap="_itemtap" class="caseitem">
-              {{item.caseID}}
+
+
+
+
+
+
             </div>
           </template>
         </div>
@@ -130,6 +144,10 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           value: function () {
             return {};
           }
+        },
+        _toggleState: {
+          type: String,
+          value: "arrow-downward"
         }
       },
       
@@ -164,6 +182,22 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 
       _doListSort: function () {
         this.$.medcaselist.render();
+      },
+
+      _doClearList: function () {
+        this.$.getOpen.checked = false;
+        this.$.getTaed.checked = false;
+        this.$.getClosed.checked = false;
+        alert("_doClearList");
+      },
+
+      _doSearchToggle: function () {
+        this.$.searchform.toggle();
+        if (this.$.searchform.opened) {
+          this._toggleState = "arrow-upward"
+        } else {
+          this._toggleState = "arrow-downward"
+        }
       },
 
       // utilities

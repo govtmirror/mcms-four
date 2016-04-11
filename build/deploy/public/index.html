@@ -13483,6 +13483,8 @@ if (!window.Promise) {
 </script>
 
 
+
+
 <script>
   /**
    * The `iron-iconset-svg` element allows users to define their own icon sets
@@ -16103,7 +16105,445 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
 
 
+<script>
 
+  /**
+   * Use `Polymer.IronCheckedElementBehavior` to implement a custom element
+   * that has a `checked` property, which can be used for validation if the
+   * element is also `required`. Element instances implementing this behavior
+   * will also be registered for use in an `iron-form` element.
+   *
+   * @demo demo/index.html
+   * @polymerBehavior Polymer.IronCheckedElementBehavior
+   */
+  Polymer.IronCheckedElementBehaviorImpl = {
+
+    properties: {
+      /**
+       * Fired when the checked state changes.
+       *
+       * @event iron-change
+       */
+
+      /**
+       * Gets or sets the state, `true` is checked and `false` is unchecked.
+       */
+      checked: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true,
+        notify: true,
+        observer: '_checkedChanged'
+      },
+
+      /**
+       * If true, the button toggles the active state with each tap or press
+       * of the spacebar.
+       */
+      toggles: {
+        type: Boolean,
+        value: true,
+        reflectToAttribute: true
+      },
+
+      /* Overriden from Polymer.IronFormElementBehavior */
+      value: {
+        type: String,
+        value: 'on',
+        observer: '_valueChanged'
+      }
+    },
+
+    observers: [
+      '_requiredChanged(required)'
+    ],
+
+    created: function() {
+      // Used by `iron-form` to handle the case that an element with this behavior
+      // doesn't have a role of 'checkbox' or 'radio', but should still only be
+      // included when the form is serialized if `this.checked === true`.
+      this._hasIronCheckedElementBehavior = true;
+    },
+
+    /**
+     * Returns false if the element is required and not checked, and true otherwise.
+     * @param {*=} _value Ignored.
+     * @return {boolean} true if `required` is false, or if `required` and `checked` are both true.
+     */
+    _getValidity: function(_value) {
+      return this.disabled || !this.required || (this.required && this.checked);
+    },
+
+    /**
+     * Update the aria-required label when `required` is changed.
+     */
+    _requiredChanged: function() {
+      if (this.required) {
+        this.setAttribute('aria-required', 'true');
+      } else {
+        this.removeAttribute('aria-required');
+      }
+    },
+
+    /**
+     * Fire `iron-changed` when the checked state changes.
+     */
+    _checkedChanged: function() {
+      this.active = this.checked;
+      this.fire('iron-change');
+    },
+
+    /**
+     * Reset value to 'on' if it is set to `undefined`.
+     */
+    _valueChanged: function() {
+      if (this.value === undefined || this.value === null) {
+        this.value = 'on';
+      }
+    }
+  };
+
+  /** @polymerBehavior Polymer.IronCheckedElementBehavior */
+  Polymer.IronCheckedElementBehavior = [
+    Polymer.IronFormElementBehavior,
+    Polymer.IronValidatableBehavior,
+    Polymer.IronCheckedElementBehaviorImpl
+  ];
+
+</script>
+<script>
+
+  /**
+   * Use `Polymer.PaperCheckedElementBehavior` to implement a custom element
+   * that has a `checked` property similar to `Polymer.IronCheckedElementBehavior`
+   * and is compatible with having a ripple effect.
+   * @polymerBehavior Polymer.PaperCheckedElementBehavior
+   */
+  Polymer.PaperCheckedElementBehaviorImpl = {
+
+    /**
+     * Synchronizes the element's checked state with its ripple effect.
+     */
+    _checkedChanged: function() {
+      Polymer.IronCheckedElementBehaviorImpl._checkedChanged.call(this);
+      if (this.hasRipple()) {
+        if (this.checked) {
+          this._ripple.setAttribute('checked', '');
+        } else {
+          this._ripple.removeAttribute('checked');
+        }
+      }
+    },
+
+    /**
+     * Synchronizes the element's `active` and `checked` state.
+     */
+    _buttonStateChanged: function() {
+      Polymer.PaperRippleBehavior._buttonStateChanged.call(this);
+      if (this.disabled) {
+        return;
+      }
+      if (this.isAttached) {
+        this.checked = this.active;
+      }
+    }
+
+  };
+
+  /** @polymerBehavior Polymer.PaperCheckedElementBehavior */
+  Polymer.PaperCheckedElementBehavior = [
+    Polymer.PaperInkyFocusBehavior,
+    Polymer.IronCheckedElementBehavior,
+    Polymer.PaperCheckedElementBehaviorImpl
+  ];
+
+</script>
+
+
+
+
+<script>
+(function() {
+  "use strict";
+  /**
+    `Polymer.IronJsonpLibraryBehavior` loads a jsonp library.
+    Multiple components can request same library, only one copy will load.
+
+    Some libraries require a specific global function be defined.
+    If this is the case, specify the `callbackName` property.
+
+    You should use an HTML Import to load library dependencies
+    when possible instead of using this element.
+
+    @hero hero.svg
+    @demo demo/index.html
+    @polymerBehavior
+   */
+  Polymer.IronJsonpLibraryBehavior = {
+
+    properties: {
+      /**
+       * True if library has been successfully loaded
+       */
+      libraryLoaded: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        readOnly: true
+      },
+      /**
+       * Not null if library has failed to load
+       */
+      libraryErrorMessage: {
+        type: String,
+        value: null,
+        notify: true,
+        readOnly: true
+      }
+      // Following properties are to be set by behavior users
+      /**
+       * Library url. Must contain string `%%callback%%`.
+       *
+       * `%%callback%%` is a placeholder for jsonp wrapper function name
+       *
+       * Ex: https://maps.googleapis.com/maps/api/js?callback=%%callback%%
+       * @property libraryUrl
+       */
+      /**
+       * Set if library requires specific callback name.
+       * Name will be automatically generated if not set.
+       * @property callbackName
+       */
+      /**
+       * name of event to be emitted when library loads. Standard is `api-load`
+       * @property notifyEvent
+       */
+      /**
+       * event with name specified in `notifyEvent` attribute
+       * will fire upon successful load2
+       * @event `notifyEvent`
+       */
+    },
+
+    observers: [
+      '_libraryUrlChanged(libraryUrl)'
+    ],
+
+    _libraryUrlChanged: function(libraryUrl) {
+      // can't load before ready because notifyEvent might not be set
+      if (this._isReady && this.libraryUrl)
+        this._loadLibrary();
+    },
+
+    _libraryLoadCallback: function(err, result) {
+      if (err) {
+        console.warn("Library load failed:", err.message);
+        this._setLibraryErrorMessage(err.message);
+      }
+      else {
+        this._setLibraryErrorMessage(null);
+        this._setLibraryLoaded(true);
+        if (this.notifyEvent)
+          this.fire(this.notifyEvent, result);
+      }
+    },
+
+    /** loads the library, and fires this.notifyEvent upon completion */
+    _loadLibrary: function() {
+      LoaderMap.require(
+        this.libraryUrl,
+        this._libraryLoadCallback.bind(this),
+        this.callbackName
+      );
+    },
+
+    ready: function() {
+      this._isReady = true;
+      if (this.libraryUrl)
+        this._loadLibrary();
+    }
+  };
+
+  /**
+   * LoaderMap keeps track of all Loaders
+   */
+  var LoaderMap = {
+    apiMap: {}, // { hash -> Loader }
+
+    /**
+     * @param {Function} notifyCallback loaded callback fn(result)
+     * @param {string} jsonpCallbackName name of jsonpcallback. If API does not provide it, leave empty. Optional.
+     */
+    require: function(url, notifyCallback, jsonpCallbackName) {
+
+      // make hashable string form url
+      var name = this.nameFromUrl(url);
+
+      // create a loader as needed
+      if (!this.apiMap[name])
+        this.apiMap[name] = new Loader(name, url, jsonpCallbackName);
+
+      // ask for notification
+      this.apiMap[name].requestNotify(notifyCallback);
+    },
+
+    nameFromUrl: function(url) {
+      return url.replace(/[\:\/\%\?\&\.\=\-\,]/g, '_') + '_api';
+    }
+  };
+
+  /** @constructor */
+  var Loader = function(name, url, callbackName) {
+    this.notifiers = [];  // array of notifyFn [ notifyFn* ]
+
+    // callback is specified either as callback name
+    // or computed dynamically if url has callbackMacro in it
+    if (!callbackName) {
+      if (url.indexOf(this.callbackMacro) >= 0) {
+        callbackName = name + '_loaded';
+        url = url.replace(this.callbackMacro, callbackName);
+      } else {
+        this.error = new Error('IronJsonpLibraryBehavior a %%callback%% parameter is required in libraryUrl');
+        // TODO(sjmiles): we should probably fallback to listening to script.load
+        return;
+      }
+    }
+    this.callbackName = callbackName;
+    window[this.callbackName] = this.success.bind(this);
+    this.addScript(url);
+  };
+
+  Loader.prototype = {
+
+    callbackMacro: '%%callback%%',
+    loaded: false,
+
+    addScript: function(src) {
+      var script = document.createElement('script');
+      script.src = src;
+      script.onerror = this.handleError.bind(this);
+      var s = document.querySelector('script') || document.body;
+      s.parentNode.insertBefore(script, s);
+      this.script = script;
+    },
+
+    removeScript: function() {
+      if (this.script.parentNode) {
+        this.script.parentNode.removeChild(this.script);
+      }
+      this.script = null;
+    },
+
+    handleError: function(ev) {
+      this.error = new Error("Library failed to load");
+      this.notifyAll();
+      this.cleanup();
+    },
+
+    success: function() {
+      this.loaded = true;
+      this.result = Array.prototype.slice.call(arguments);
+      this.notifyAll();
+      this.cleanup();
+    },
+
+    cleanup: function() {
+      delete window[this.callbackName];
+    },
+
+    notifyAll: function() {
+      this.notifiers.forEach( function(notifyCallback) {
+        notifyCallback(this.error, this.result);
+      }.bind(this));
+      this.notifiers = [];
+    },
+
+    requestNotify: function(notifyCallback) {
+      if (this.loaded || this.error) {
+        notifyCallback( this.error, this.result);
+      } else {
+        this.notifiers.push(notifyCallback);
+      }
+    }
+  };
+})();
+</script>
+
+
+<script>
+  Polymer({
+
+    is: 'iron-jsonp-library',
+
+    behaviors: [ Polymer.IronJsonpLibraryBehavior ],
+
+    properties: {
+      /**
+       * Library url. Must contain string `%%callback%%`.
+       *
+       * `%%callback%%` is a placeholder for jsonp wrapper function name
+       *
+       * Ex: https://maps.googleapis.com/maps/api/js?callback=%%callback%%
+       */
+      libraryUrl: String,
+      /**
+       * Set if library requires specific callback name.
+       * Name will be automatically generated if not set.
+       */
+      callbackName: String,
+      /**
+       * event with name specified in 'notifyEvent' attribute
+       * will fire upon successful load
+       */
+      notifyEvent: String
+      /**
+       * event with name specified in 'notifyEvent' attribute
+       * will fire upon successful load
+       * @event `notifyEvent`
+       */
+
+    }
+  });
+
+</script>
+
+<script>
+  Polymer({
+
+    is: 'google-plusone-api',
+
+    behaviors: [
+      Polymer.IronJsonpLibraryBehavior
+    ],
+
+    properties: {
+
+      /** @private */
+      libraryUrl:  {
+        type: String,
+        value: 'https://apis.google.com/js/plusone.js?onload=%%callback%%'
+      },
+
+      /**
+       * Fired when the API library is loaded and available.
+       * @event js-api-load
+       */
+      /**
+       * Name of event fired when library is loaded and available.
+       */
+      notifyEvent:  {
+        type: String,
+        value: 'api-load'
+      }
+
+    },
+
+    get api() {
+      return gapi;
+    }
+
+  });
+</script>
 
 
 
@@ -18142,6 +18582,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         display: block;
         margin-left: auto;
         margin-right: auto;
+        margin-top: 10%;
         width: 300px;
         max-width: 300px;
         height: auto;
@@ -18178,6 +18619,9 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           font-size: 0.8em;
           line-height: 16px;
         }
+        .acceptBtn {
+          font-size: 1.2em;
+        }
       }
 
       #acceptbtn {
@@ -18201,7 +18645,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         <p>False, Fictitious or Fraudulent Claims:  Whoever makes or presents to any person or officer in the civil, military, or naval service of the United States, or to any department or agency thereof, any claim upon or against the United States or any department or agency thereof, knowing such claims to be false, fictitious or fraudulent, shall be fined not more that $10,000 or imprisoned not more that five years or both.  June 25, 1948, C., 645, 62 State. 698 (Title U.S. Code 287).</p>
       
       <div class="buttons">
-        <paper-button dialog-dismiss="">I Accept</paper-button>
+        <paper-button dialog-dismiss="" id="acceptbtn" class="acceptBtn">I Accept</paper-button>
       </div>
     </paper-dialog>
     
@@ -18236,7 +18680,216 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       
     });
     })();
-  </script><dom-module id="iron-icon" assetpath="bower_components/iron-icon/">
+  </script><dom-module id="iron-collapse" assetpath="bower_components/iron-collapse/">
+
+  <style>
+
+    :host {
+      display: block;
+      transition-duration: 300ms;
+      overflow: visible;
+    }
+
+    :host(.iron-collapse-closed) {
+      display: none;
+    }
+
+    :host(:not(.iron-collapse-opened)) {
+      overflow: hidden;
+    }
+
+  </style>
+
+  <template>
+
+    <content></content>
+
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+
+    is: 'iron-collapse',
+
+    behaviors: [
+      Polymer.IronResizableBehavior
+    ],
+
+    properties: {
+
+      /**
+       * If true, the orientation is horizontal; otherwise is vertical.
+       *
+       * @attribute horizontal
+       */
+      horizontal: {
+        type: Boolean,
+        value: false,
+        observer: '_horizontalChanged'
+      },
+
+      /**
+       * Set opened to true to show the collapse element and to false to hide it.
+       *
+       * @attribute opened
+       */
+      opened: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        observer: '_openedChanged'
+      },
+
+      /**
+       * Set noAnimation to true to disable animations
+       *
+       * @attribute noAnimation
+       */
+      noAnimation: {
+        type: Boolean
+      },
+
+    },
+
+    get dimension() {
+      return this.horizontal ? 'width' : 'height';
+    },
+
+    hostAttributes: {
+      role: 'group',
+      'aria-hidden': 'true',
+      'aria-expanded': 'false'
+    },
+
+    listeners: {
+      transitionend: '_transitionEnd'
+    },
+
+    attached: function() {
+      // It will take care of setting correct classes and styles.
+      this._transitionEnd();
+    },
+
+    /**
+     * Toggle the opened state.
+     *
+     * @method toggle
+     */
+    toggle: function() {
+      this.opened = !this.opened;
+    },
+
+    show: function() {
+      this.opened = true;
+    },
+
+    hide: function() {
+      this.opened = false;
+    },
+
+    updateSize: function(size, animated) {
+      // No change!
+      if (this.style[this.dimension] === size) {
+        return;
+      }
+
+      this._updateTransition(false);
+      // If we can animate, must do some prep work.
+      if (animated && !this.noAnimation && this._isDisplayed) {
+        // Animation will start at the current size.
+        var startSize = this._calcSize();
+        // For `auto` we must calculate what is the final size for the animation.
+        // After the transition is done, _transitionEnd will set the size back to `auto`.
+        if (size === 'auto') {
+          this.style[this.dimension] = size;
+          size = this._calcSize();
+        }
+        // Go to startSize without animation.
+        this.style[this.dimension] = startSize;
+        // Force layout to ensure transition will go. Set offsetHeight to itself
+        // so that compilers won't remove it.
+        this.offsetHeight = this.offsetHeight;
+        // Enable animation.
+        this._updateTransition(true);
+      }
+      // Set the final size.
+      this.style[this.dimension] = size;
+    },
+
+    /**
+     * enableTransition() is deprecated, but left over so it doesn't break existing code.
+     * Please use `noAnimation` property instead.
+     *
+     * @method enableTransition
+     * @deprecated since version 1.0.4
+     */
+    enableTransition: function(enabled) {
+      console.warn('`enableTransition()` is deprecated, use `noAnimation` instead.');
+      this.noAnimation = !enabled;
+    },
+
+    _updateTransition: function(enabled) {
+      this.style.transitionDuration = (enabled && !this.noAnimation) ? '' : '0s';
+    },
+
+    _horizontalChanged: function() {
+      this.style.transitionProperty = this.dimension;
+      var otherDimension = this.dimension === 'width' ? 'height' : 'width';
+      this.style[otherDimension] = '';
+      this.updateSize(this.opened ? 'auto' : '0px', false);
+    },
+
+    _openedChanged: function() {
+      this.setAttribute('aria-expanded', this.opened);
+      this.setAttribute('aria-hidden', !this.opened);
+
+      this.toggleClass('iron-collapse-closed', false);
+      this.toggleClass('iron-collapse-opened', false);
+      this.updateSize(this.opened ? 'auto' : '0px', true);
+
+      // Focus the current collapse.
+      if (this.opened) {
+        this.focus();
+      }
+      if (this.noAnimation) {
+        this._transitionEnd();
+      }
+    },
+
+    _transitionEnd: function() {
+      if (this.opened) {
+        this.style[this.dimension] = 'auto';
+      }
+      this.toggleClass('iron-collapse-closed', !this.opened);
+      this.toggleClass('iron-collapse-opened', this.opened);
+      this._updateTransition(false);
+      this.notifyResize();
+    },
+
+    /**
+     * Simplistic heuristic to detect if element has a parent with display: none
+     *
+     * @private
+     */
+    get _isDisplayed() {
+      var rect = this.getBoundingClientRect();
+      for (var prop in rect) {
+        if (rect[prop] !== 0) return true;
+      }
+      return false;
+    },
+
+    _calcSize: function() {
+      return this.getBoundingClientRect()[this.dimension] + 'px';
+    }
+
+  });
+
+</script>
+<dom-module id="iron-icon" assetpath="bower_components/iron-icon/">
 
   <style>
     :host {
@@ -20221,6 +20874,172 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     })();
   </script>
 </dom-module>
+<dom-module id="paper-radio-button" assetpath="bower_components/paper-radio-button/">
+  <template strip-whitespace="">
+    <style>
+      :host {
+        display: inline-block;
+        white-space: nowrap;
+        cursor: pointer;
+        @apply(--paper-font-common-base);
+      }
+
+      :host(:focus) {
+        outline: none;
+      }
+
+      #radioContainer {
+        display: inline-block;
+        position: relative;
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+      }
+
+      #ink {
+        position: absolute;
+        top: -16px;
+        left: -16px;
+        width: 48px;
+        height: 48px;
+        color: var(--paper-radio-button-unchecked-ink-color, --primary-text-color);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      :host-context([dir="rtl"]) #ink {
+        right: -15px;
+        left: auto;
+      }
+
+      #ink[checked] {
+        color: var(--paper-radio-button-checked-ink-color, --primary-color);
+      }
+
+      #offRadio {
+        position: absolute;
+        box-sizing: content-box;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: solid 2px;
+        background-color: var(--paper-radio-button-unchecked-background-color, transparent);
+        border-color: var(--paper-radio-button-unchecked-color, --primary-text-color);
+        transition: border-color 0.28s;
+      }
+
+      #onRadio {
+        position: absolute;
+        box-sizing: content-box;
+        top: 4px;
+        left: 4px;
+        right: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--paper-radio-button-checked-color, --primary-color);
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        transition: -webkit-transform ease 0.28s;
+        transition: transform ease 0.28s;
+        will-change: transform;
+      }
+
+      :host([checked]) #offRadio {
+        border-color: var(--paper-radio-button-checked-color, --primary-color);
+      }
+
+      :host([checked]) #onRadio {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+
+      #radioLabel {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: var(--paper-radio-button-label-spacing, 10px);
+        white-space: normal;
+        color: var(--paper-radio-button-label-color, --primary-text-color);
+      }
+
+      :host-context([dir="rtl"]) #radioLabel {
+        margin-left: 0px;
+        margin-right: var(--paper-radio-button-label-spacing, 10px);
+      }
+
+      #radioLabel[hidden] {
+        display: none;
+      }
+
+      /* disabled state */
+
+      :host([disabled]) #offRadio {
+        border-color: var(--paper-radio-button-unchecked-color, --primary-text-color);
+        opacity: 0.5;
+      }
+
+      :host([disabled][checked]) #onRadio {
+        background-color: var(--paper-radio-button-unchecked-color, --primary-text-color);
+        opacity: 0.5;
+      }
+
+      :host([disabled]) #radioLabel {
+        /* slightly darker than the button, so that it's readable */
+        opacity: 0.65;
+      }
+    </style>
+
+    <div id="radioContainer">
+      <div id="offRadio"></div>
+      <div id="onRadio"></div>
+    </div>
+
+    <div id="radioLabel"><content></content></div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'paper-radio-button',
+
+      behaviors: [
+        Polymer.PaperCheckedElementBehavior
+      ],
+
+      hostAttributes: {
+        role: 'radio',
+        'aria-checked': false,
+        tabindex: 0
+      },
+
+      properties: {
+        /**
+         * Fired when the checked state changes due to user interaction.
+         *
+         * @event change
+         */
+
+        /**
+         * Fired when the checked state changes.
+         *
+         * @event iron-change
+         */
+
+        ariaActiveAttribute: {
+          type: String,
+          value: 'aria-checked'
+        }
+      },
+
+      ready: function() {
+        this._rippleContainer = this.$.radioContainer;
+      }
+    })
+  </script>
+</dom-module>
 <dom-module id="paper-scroll-header-panel" assetpath="bower_components/paper-scroll-header-panel/">
 
   <style>
@@ -20715,6 +21534,135 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
 })();
 
+</script>
+<dom-module id="google-hangout-button" assetpath="bower_components/google-hangout-button/">
+  <style>
+    :host, span {
+      display: inline-block;
+    }
+  </style>
+  <template>
+    <google-plusone-api id="plusone" on-api-load="_load"></google-plusone-api>
+    <span id="container"></span>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'google-hangout-button',
+
+    /**
+     * Fired when the hangout api is loaded but before rendering the button.
+     *
+     * @event google-hangout-button-pregame
+     * @param {Object} e Event parameters.
+     */
+
+    /**
+     * Fired when the button is rendered and ready to use.
+     *
+     * @event google-hangout-button-ready
+     * @param {Object} e Event parameters.
+     */
+
+     properties: {
+
+      /**
+       * Specifies what type of Hangout should be started.
+       * Valid values are 'normal', 'onair', 'party' and 'moderated'
+       *
+       * See the [Hangout button parameter reference](https://developers.google.com/+/hangouts/button#hangout_button_parameters)
+       * for more details.
+       */
+      type: {
+        type: String,
+        value: 'normal'
+      },
+
+      /**
+       * Specifies the Google+ Hangout apps to launch when a user clicks the
+       * Hangout button. Invalid objects and parameters are ignored.
+       *
+       * See the [Initial app parameters reference](https://developers.google.com/+/hangouts/button#initial_app_parameters)
+       * for more details.
+       */
+      apps: {
+        type: Array,
+        value: function() { return []; }
+      },
+
+      /**
+       * Specifies the list of people to invite when the user clicks the
+       * Hangout button. Invalid objects and parameters are ignored.
+       *
+       * See the [Invite parameters reference](https://developers.google.com/+/hangouts/button#invite_parameters)
+       * for more details.
+       */
+      invites: {
+        type: Array,
+        value: function() { return []; }
+      },
+
+      /**
+       * Pre-populates the topic field for Hangouts on Air. Note that users can
+       * change the topic of the Hangout after they have joined.
+       */
+      topic: {
+        type: String,
+        value: null
+      },
+
+      /**
+       * Specifies the width of the button.
+       */
+      width: {
+        type: Number,
+        value: 136
+      },
+
+      _loaded: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    _load: function() {
+      // TODO(sjmiles): pre/post shenanigans required because gapi.hangout.render
+      // throws if not rendered into main document light-dom
+      var container = this._pregame();
+      this.$.plusone.api.hangout.render(container, {
+        'render': 'createhangout',
+        'hangout_type': this.type,
+        'initial_apps': this.apps,
+        'invites': this.invites,
+        'topic': this.topic,
+        'widget_size': this.width
+      });
+      this._postgame(container);
+    },
+    _pregame: function() {
+      var object = document.createElement('span');
+      document.body.appendChild(object);
+      this.fire('google-hangout-button-pregame');
+      return object;
+    },
+    _postgame: function(object) {
+      // when the iframe finishes it's dirty business, snarf it into the shadow-root
+      var iframe = object.firstElementChild;
+      iframe.addEventListener('load', function() {
+        if (!this._loaded) {
+          // TODO(sjmiles): appending directly to shadowRoot not working under polyfill
+          //this.shadowRoot.appendChild(object);
+          this.$.container.appendChild(object);
+          this._loaded = true;
+          this.fire('google-hangout-button-ready');
+        }
+      }.bind(this));
+    },
+    ready: function () {
+      this.apps = this.apps || [];
+      this.invites = this.invites || [];
+    }
+  });
 </script>
 <dom-module id="app-drawer" assetpath="bower_components/app-layout/app-drawer/">
 
@@ -22162,8 +23110,15 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
   <template>
     <h1>Activity List</h1>
-    <template is="dom-repeat" items="{{selectedActivities}}">
-      <p>yo: {{item.__firebaseKey__}}</p>
+    <template is="dom-repeat" items="{{selectedActivities}}" filter="_isDisplay" id="actlist">
+
+      <div>
+        <h4>{{item.activityType}} dated {{item.activityDate}}</h4> 
+        
+      </div>
+
+
+
     </template>
   </template>
 
@@ -22174,7 +23129,37 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       is: 'mcms-activitylist',
 
       properties: {
-        selectedActivities: Array
+        selectedActivities: Array,
+        selectedCase: {
+          type: Object,
+          value: function () {
+            return {};
+          }
+        }
+      },
+
+      _isDisplay: function (item) {
+        return true;
+      },
+
+      _hasCase: function (item) {
+        var teststring = this.selectedCase.caseID;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.cases;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return false;
+        }  
       }
 
     });
@@ -22186,19 +23171,62 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     :host {
       display: block;
       box-sizing: border-box;
-      font-family: 'Roboto', 'Noto', sans-serif;
-      font-size: 14px;
       padding: 24px;
-      background-color: gray;
+      background-color: var(--light-accent-color);
       margin: 10px;
       border-radius: 10px;
-      color: white;
     }
+
+    td {
+      @apply(--paper-font-body2);
+      background-color: var(--light-theme-background-color);
+      /*background-color: green;*/
+      padding:5px;
+      border-color: var(--light-primary-color);
+      border-width: 1px;
+      border-style: solid;
+    }
+
+    .rightshift {
+      text-align: right;
+      min-width: 150px;
+    }
+
+    .headerbox {
+      @apply(--paper-font-body1);
+      padding: 10px;
+      background-color: var(--light-theme-background-color);
+      margin-bottom: 10px;
+      border-radius: 10px;
+      max-width: 250px;
+    }
+
+    .caseheader {
+      @apply(--paper-font-title);
+    }
+
   </style>
 
   <template>
-    <h1>Case Detail</h1>
-    <h2>{{selectedCase.caseID}}</h2>
+      <div class="headerbox">
+        <div class="caseheader">{{selectedCase.caseID}} {{selectedCase.caseSuffix}}</div>
+        <div>{{selectedCase.orgs}} - {{selectedCase.carriers}}</div>
+        <div>{{selectedCase.crafts}} - {{selectedCase.numberOfEmployees}} emp.</div>
+      </div>
+      <table>
+        <tbody><tr><td>Status</td><td class="rightshift">{{selectedCase.caseState}}</td></tr>
+        <tr><td>Docket</td><td class="rightshift">[[dateConvert(selectedCase.docketDate)]]</td></tr>
+        <tr><td>Cumm. Days</td><td class="rightshift">{{selectedCase.cummDays}}</td></tr>
+        <tr><td>Amedable Date</td><td class="rightshift">[[dateConvert(selectedCase.amendableDate)]]</td></tr>
+        <tr><td>Scheduled</td><td class="rightshift">[[dateConvert(selectedCase.scheduledDate)]]</td></tr>
+        <tr><td>TA Date</td><td class="rightshift">[[dateConvert(selectedCase.taDate)]]</td></tr>
+        <tr><td>Ratified</td><td class="rightshift">[[dateConvert(selectedCase.ratifyDate)]]</td></tr>
+        <tr><td>New A. Date</td><td class="rightshift">[[dateConvert(selectedCase.newAmendableDate)]]</td></tr>
+        <tr><td>Closed</td><td class="rightshift">[[dateConvert(selectedCase.closedDate)]]</td></tr>
+        <tr><td>Closure Reason</td><td class="rightshift">{{selectedCase.closureReason}}</td></tr>
+      </tbody></table>
+
+
   </template>
 
   <script>
@@ -22215,8 +23243,18 @@ is separate from validation, and `allowed-pattern` does not affect how the input
             return {};
           }
         }
+      },
 
-      }
+      // utilities
+      
+      dateConvert: function (stringint) {
+        if (stringint != "" && stringint != null){
+          var d = new Date(parseInt(stringint));
+          return d.toLocaleDateString();
+        } else {
+          return "n/a";
+        }
+      },
 
     });
 
@@ -22242,7 +23280,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       color: black;
     }
     .caseselected {
-      background-color: pink;
+      background-color: var(--paper-pink-a200);
       color: white;
     }
    
@@ -22253,23 +23291,38 @@ is separate from validation, and `allowed-pattern` does not affect how the input
   </style>
 
   <template>
-
-  <div class="aaaa">
-    <paper-header-panel mode="waterfall">
-      <div>
-        <paper-input label="Case number:" always-float-label=""></paper-input>
-        <paper-input label="NMB member:" always-float-label=""></paper-input>
-        <paper-input label="Carrier or Organization:" always-float-label=""></paper-input>
-      </div>
-      <div class="fit">
-        <template is="dom-repeat" items="{{caselist}}">
-          <div on-tap="_itemtap" class="caseitem">
-            {{item.caseID}}
-          </div>
-        </template>
-      </div>
-    </paper-header-panel>
-  </div>
+    
+    <div class="aaaa">
+      <paper-header-panel mode="waterfall">
+        <div>
+          <paper-radio-button checked="" id="getOpen" on-change="_doListSort">
+            Open
+          </paper-radio-button>
+          <paper-radio-button id="getTaed" on-change="_doListSort">
+            Ta'ed
+          </paper-radio-button>
+          <paper-radio-button id="getClosed" on-change="_doListSort">
+            Closed
+          </paper-radio-button>
+          <paper-input id="casetest" label="Case number:" on-change="_doListSort">
+          </paper-input>
+          <paper-input id="membertest" label="NMB member:" on-change="_doListSort">
+          </paper-input>
+          <paper-input id="carriertest" label="Carrier:" on-change="_doListSort">
+          </paper-input>
+          <paper-input id="orgtest" label="Organization:" on-change="_doListSort">
+          </paper-input>
+        </div>
+        <div class="fit">
+          <template is="dom-repeat" id="medcaselist" items="{{caselist}}" filter="isDisplay">
+            <div on-tap="_itemtap" class="caseitem">
+              {{item.caseID}}
+            </div>
+          </template>
+        </div>
+      </paper-header-panel>
+    </div>
+  
 
   </template>
 
@@ -22285,56 +23338,148 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           value: function () {
             return [];
           }
+        },
+        selectedCase: {
+          type: Object,
+          value: function () {
+            return {};
+          }
         }
       },
+      
 
       // Element Behavior
 
       _itemtap: function (event) {
+        // remove caseselected class from all elements
         try {
           this.toggleClass('caseselected', false, this.$$('.caseselected'));
         } 
         catch(err) {
           console.log("no caseselected");
         }
-        if (event.target.nodeName != "DIV") {
-          this.toggleClass('caseselected', true, event.target.parentNode);
-        } else {
-          this.toggleClass('caseselected', true, event.target);
+        //  make the comparison to existing selected case
+        var cid = event.model.item.__firebaseKey__;
+        var isNewCase = true;
+        if (this.selectedCase != null && cid == this.selectedCase.caseID ) {
+          isNewCase = false;
         }
-        this.fire('case-selected', {"caseId": event.model.item.__firebaseKey__});
+        //  set or not the case selected class
+        if (event.target.nodeName != "DIV") {
+          this.toggleClass('caseselected', isNewCase, event.target.parentNode);
+        } else {
+          this.toggleClass('caseselected', isNewCase, event.target);
+        }
+        this.fire('case-selected', {
+          "caseId": event.model.item.__firebaseKey__,
+          "isNewCase": isNewCase
+        });
+      },
+
+      _doListSort: function () {
+        this.$.medcaselist.render();
+      },
+
+      // utilities
+      
+      dateConvert: function (stringint) {
+        if (stringint != "" && stringint != null){
+          var d = new Date(parseInt(stringint));
+          return d.toLocaleDateString();
+        } else {
+          return "n/a";
+        }
+      },
+
+      isDisplay: function (item) {
+        // console.log("display results = " + 
+        //   this._getState(item) + ", " + 
+        //   this._caseStartsWith(item) + ", " + 
+        //   this._hasMember(item)) ;
+        return this._getState(item) && 
+               this._caseStartsWith(item) &&
+               this._hasMember(item) &&
+               this._hasCarrier(item) &&
+               this._hasOrg(item);
+      },
+      
+      _getState: function (item) {
+        return (
+          (item.caseState == "open" && this.$.getOpen.checked) ||
+          (item.caseState == "closed" && this.$.getClosed.checked) ||
+          (item.caseState == "taed" && this.$.getTaed.checked)
+        );
+      },
+
+      _caseStartsWith: function (item) {
+        var teststring = this.$.casetest.value;
+        if (teststring) {
+          return item.caseID.startsWith(teststring);
+        } else {
+          return true;
+        }  
+      },
+
+      _hasMember: function (item) {
+        var teststring = this.$.membertest.value;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.nmbMembers;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].name.startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return true;
+        }  
+      },
+
+      _hasCarrier: function (item) {
+        var teststring = this.$.carriertest.value;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.carriers;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return true;
+        }  
+      },
+
+      _hasOrg: function (item) {
+        var teststring = this.$.orgtest.value;
+        if (teststring) {
+          var testresult = false;
+          var testObject = item.orgs;
+          for (var prop in testObject) {
+            if (!testObject.hasOwnProperty(prop)) {
+              //The current property is not a direct property of p
+              continue;
+            }
+            if (testObject[prop].startsWith(teststring)) {
+              testresult = true;
+            }
+          }
+          return testresult;
+        } else {
+          return true;
+        }  
       }
 
-    });
-
-  </script>
-</dom-module><dom-module id="mcms-caseselector" assetpath="bower_components/mcms-four/elements/">
-
-  <style>
-    :host {
-      display: block;
-      box-sizing: border-box;
-      font-family: 'Roboto', 'Noto', sans-serif;
-      font-size: 14px;
-      padding: 24px;
-      background-color: gray;
-      margin: 10px;
-      border-radius: 10px;
-      color: white;
-    }
-  </style>
-
-  <template>
-    <h1>Case Selector</h1>
-  </template>
-
-  <script>
-
-    Polymer({
-
-      is: 'mcms-caseselector',
-
-      properties: {}
 
     });
 
@@ -22377,14 +23522,16 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 	<template>
 		<div class="mainlayout">
 			<div class="leftside">
-				<mcms-caselist caselist="{{medcases}}">
+				<mcms-caselist caselist="{{medcases}}" selected-case="{{selectedCase}}">
 				</mcms-caselist>
 			</div>
 			<div class="flexchild">
-				<mcms-casedetail selected-case="{{selectedCase}}">
-				</mcms-casedetail>
-				<mcms-activitylist selected-activities="{{selectedActivities}}">
-				</mcms-activitylist>
+				<iron-collapse id="stuff">
+					<mcms-casedetail selected-case="{{selectedCase}}">
+					</mcms-casedetail>
+					<mcms-activitylist selected-case="{{selectedCase}}" selected-activities="{{selectedActivities}}">
+					</mcms-activitylist>
+				</iron-collapse>
 			</div>
 		</div>
 		
@@ -22400,9 +23547,17 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 				medcases: Array,
 				selectedCase: Object,
 				selectedActivities: Array
+			},
+
+			ready: function () {
+				this.addEventListener('case-selected', function(event) {
+					if (event.detail.isNewCase) {
+						this.$.stuff.show()
+					} else {
+						this.$.stuff.hide()
+					}
+				});
 			}
-
-
 		});
 
 	</script>
@@ -22492,9 +23647,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
 
 			setSelectedCaseUrl: function (caseId) {
-				this.selectedCaseId = caseId;
-				this._selectedCaseUrl = this._medcasePath + "/" + caseId;
-				// alert(this.selectedCaseId);
+				if (this.selectedCaseId != caseId) {
+					this.selectedCaseId = caseId;
+					this._selectedCaseUrl = this._medcasePath + "/" + caseId;
+				} else {
+					this.selectedCaseId = null;
+					this._selectedCaseUrl = this._medcasePath + "/A-00000";
+				}
 			}
  
 
@@ -22519,15 +23678,18 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           overflow-x: hidden;
         };
       }
+
       
       .main-header {
         border-bottom: 1px solid #ddd;
+        color:var(--dark-theme-text-color);
         background-color: var(--primary-color);
       }
 
       .title {
         @apply(--paper-font-display2);
-        color: #fff;
+        @apply(--layout-flex);
+        text-align: center;
       }
 
       .maincontent {
@@ -22540,6 +23702,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         /* make title smaller to fit on screen */
         .title {
           @apply(--paper-font-headline);
+          @apply(--layout-flex);
+          text-align: center;
           color: #fff;
         }
       }
@@ -22558,13 +23722,15 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
       
       <app-drawer id="drawer">
+        
         <app-toolbar></app-toolbar>
         
         <paper-menu selected="{{_pageName}}" attr-for-selected="name" on-iron-activate="_drawerSelected">
           <template is="dom-repeat" items="{{menuItems}}">
             <paper-item name="{{item.name}}">{{item.title}}</paper-item>
           </template>
-        </paper-menu>
+        </paper-menu><br><br>
+        <google-hangout-button></google-hangout-button>
 
       </app-drawer>
 
@@ -22580,6 +23746,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           
             
             <div class="title">{{appTitle}}</div>
+            <paper-icon-button icon="account-circle" on-tap="loginBtn">
+            </paper-icon-button>
           </app-toolbar>
         </app-header>
 
@@ -22642,6 +23810,10 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
       _drawerSelected: function() {
         if (!this.$.drawer.persistent) this.$.drawer.close();
+      },
+
+      loginBtn: function () {
+        alert("Are you wondering about login?");
       }
 
     });
