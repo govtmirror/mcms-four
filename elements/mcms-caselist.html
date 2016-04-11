@@ -16,6 +16,14 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       padding:10px;
       /*height: 75vh;*/
     }
+
+    .flex-horizontal {
+      @apply(--layout-horizontal);
+    }
+    .flexchild {
+      @apply(--layout-flex);
+    }
+
     .caseitem {
       border-radius: 10px;
       padding: 10px;
@@ -39,8 +47,19 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
     <div class="aaaa">
       <paper-header-panel mode="waterfall">
         <div>
+          <div class="flex-horizontal">
+            <paper-icon-button
+                icon="add">
+            </paper-icon-button>
+            <div class="flexchild"></div>
+            <paper-icon-button
+                icon="search">
+            </paper-icon-button>
+            <paper-icon-button
+                icon="clear">
+            </paper-icon-button>
+          </div>
           <paper-radio-button 
-              checked
               id="getOpen" 
               on-change="_doListSort">
             Open
