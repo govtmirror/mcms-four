@@ -17,12 +17,40 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       /*height: 75vh;*/
     }
 
+    .mainlayout {
+      @apply(--layout-horizontal);
+    }
+
+    .leftside {
+      @apply(--layout-vertical);
+      width:350px;
+    }
+
     .flex-horizontal {
       @apply(--layout-horizontal);
       @apply(--layout-center);
     }
     .flexchild {
       @apply(--layout-flex);
+    }
+
+    .flex-wrap {
+      @apply(--layout-horizontal);
+      @apply(--layout-wrap);
+      width: 200px;
+    }
+
+    .flex-horizontal-with-ratios {
+      @apply(--layout-horizontal);
+    }
+    .flexchild {
+      @apply(--layout-flex);
+    }
+    .flex2child {
+      @apply(--layout-flex-2);
+    }
+    .flex3child {
+      @apply(--layout-flex-3);
     }
 
     .caseitem {
@@ -45,83 +73,157 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       height:85vh;
     }
 
+    .bluecase {
+      background-color: #ddddff;
+      padding:20px;
+      border-radius: 15px;
+    }
+
   </style>
 
   <template>
-    
-    <div class="aaaa">
-      <paper-header-panel 
-          mode="waterfall">
-        <div class="listhead">
-          <div class="flex-horizontal">
-            <paper-icon-button
-                icon="{{_toggleState}}"
-                on-tap="_doSearchToggle">
-            </paper-icon-button>
-            <div class="flexchild">Search Form</div>
 
-            
-          </div>
-          <iron-collapse id="searchform">
-            <hr>
-            <paper-radio-button 
-                id="getOpen" >
-              Open
-            </paper-radio-button>
-            <paper-radio-button 
-                id="getTaed">
-              Ta'ed
-            </paper-radio-button>
-            <paper-radio-button 
-                id="getClosed">
-              Closed
-            </paper-radio-button>
-            <paper-input 
-                id="casetest"
-                label="Case number:" >
-            </paper-input>
-            <paper-input 
-                id="membertest"
-                label="NMB member:">
-            </paper-input>
-            <paper-input 
-                id="carriertest"
-                label="Carrier:">
-            </paper-input>
-            <paper-input 
-                id="orgtest"
-                label="Organization:">
-            </paper-input>
+  <div class="mainlayout">
+    <div class="leftside">
+      <div class="aaaa">
+        <paper-header-panel 
+            mode="waterfall">
+          <div class="listhead">
             <div class="flex-horizontal">
-              <div class="flexchild"></div>
               <paper-icon-button
-                  icon="search"
-                  on-tap="_doListSort">
+                  icon="{{_toggleState}}"
+                  on-tap="_doSearchToggle">
               </paper-icon-button>
-              <paper-icon-button
-                  icon="clear"
-                  on-tap="_doClearList">
-              </paper-icon-button>
+              <div class="flexchild">Search Form</div>
+
+              
             </div>
-          </iron-collapse>
-        </div>
-        <div class="fit">
-          <template is="dom-repeat" 
-              id="medcaselist"
-              items="{{caselist}}"
-              filter="isDisplay">
-            <div on-tap="_itemtap" class="caseitem">
+            <iron-collapse id="searchform">
+              <hr>
+              <paper-radio-button 
+                  id="getOpen" >
+                Open
+              </paper-radio-button>
+              <paper-radio-button 
+                  id="getTaed">
+                Ta'ed
+              </paper-radio-button>
+              <paper-radio-button 
+                  id="getClosed">
+                Closed
+              </paper-radio-button>
+              <paper-input 
+                  id="casetest"
+                  label="Case number:" >
+              </paper-input>
+              <paper-input 
+                  id="membertest"
+                  label="NMB member:">
+              </paper-input>
+              <paper-input 
+                  id="carriertest"
+                  label="Carrier:">
+              </paper-input>
+              <paper-input 
+                  id="orgtest"
+                  label="Organization:">
+              </paper-input>
+              <div class="flex-horizontal">
+                <div class="flexchild"></div>
+                <paper-icon-button
+                    icon="search"
+                    on-tap="_doListSort">
+                </paper-icon-button>
+                <paper-icon-button
+                    icon="clear"
+                    on-tap="_doClearList">
+                </paper-icon-button>
+              </div>
+            </iron-collapse>
+          </div>
+          <div class="fit">
+            <template is="dom-repeat" 
+                id="medcaselist"
+                items="{{caselist}}"
+                filter="isDisplay">
+              <div on-tap="_itemtap" class="caseitem ">
 
 
 
+                    {{item.caseID}} {{item.caseSuffix}}, {{dateConvert(item.docketDate)}},<br>&nbsp;&nbsp;
+                    
+                    <template is="dom-repeat" items="{{item.carriers}}" as="piss">
+                      {{piss}},&nbsp;
+                    </template>
+                  
+                  
+                    <template is="dom-repeat" items="{{item.orgs}}" as="shit">
+                      {{shit}},<br>&nbsp;&nbsp;
+                    </template>
+                  
 
+                    <template is="dom-repeat" items="{{item.nmbMembers}}" as="poop">
+                      {{poop.name}},&nbsp;
+                    </template>
+                    
 
+              </div>
 
-            </div>
-          </template>
-        </div>
-      </paper-header-panel>
+                <!-- <iron-collapse opened id="dtails">
+                <br>
+                  <div>
+                    <div class="bluecase flex-horizontal-with-ratios">
+                      <div class="flexchild">
+                        <span>Case Status:<span><br>
+                        <br>
+                        <span>Cumm. Days:<span><br>
+                        <span>Amendable Date:<span><br>
+                        <span># of Employees:</span><br>
+                        <span>Craft(s):</span>
+                      </div>
+                      <div class="flex2child">
+                        <span>&nbsp;{{item.caseState}}<span><br>
+                        <br>
+                        <span>&nbsp;{{item.cummDays}}<span><br>
+                        <span>&nbsp;{{item.amendableDate}}<span><br>
+                        <span>&nbsp;{{item.numberOfEmployees}}</span><br>
+                        <template is="dom-repeat" items="{{item.crafts}}">
+                          <div>{{item}}</div>
+                        </template>
+                      </div>
+                      <div class="flexchild">
+                        <span>Next Schedule:<span><br>
+                        <span>TA Date:<span><br>
+                        <span>new Amend Date:<span><br>
+                        <span>Ratification Date:<span><br>
+                        <span>Closed Date:<span><br>
+                      </div>
+                      <div class="flex2child">
+                        <span>&nbsp;{{item.scheduledDate}}<span><br>
+                        <span>&nbsp;{{item.taDate}}<span><br>
+                        <span>&nbsp;{{item.newAmendableDate}}<span><br>
+                        <span>&nbsp;{{item.ratifyDate}}<span><br>
+                        <span>&nbsp;{{item.closedDate}}<span><br>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="bluecase">
+                    <b>Aged Case Comment:</b><br>
+                    {{item.agedCaseComment}}
+                    <br><br>
+                    </div>
+                  </div>
+                </core-collapse> -->
+                
+            </template>
+          </div>
+        </paper-header-panel>
+      </div>
     </div>
+    <mcms-casedetail
+        selected-case="{{selectedCase}}">
+    </mcms-casedetail>
+  </div>
   
 
   </template>
@@ -149,6 +251,7 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           type: String,
           value: "arrow-downward"
         }
+
       },
       
 
@@ -174,6 +277,7 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         } else {
           this.toggleClass('caseselected', isNewCase, event.target);
         }
+        
         this.fire('case-selected', {
           "caseId": event.model.item.__firebaseKey__,
           "isNewCase": isNewCase
@@ -298,6 +402,14 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         } else {
           return true;
         }  
+      },
+
+      _selectedStyle: function (id) {
+        if (id == this.selectedCase.caseID) {
+          return "caseitem caseselected";
+        } else {
+          return "caseitem";
+        }
       }
 
 

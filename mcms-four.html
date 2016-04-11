@@ -127,12 +127,16 @@ Example:
         <div class="maincontent">
           <iron-pages selected="{{_pageName}}" attr-for-selected="name">
             <aws-home name="home"></aws-home>
-            <mcms-info
+            <mcms-caselist
                 name="cases"
-                medcases="{{medCases}}"
-                selected-activities="{{selectedActivities}}"
+                caselist="{{medCases}}"
                 selected-case="{{selectedCase}}">
-            </mcms-info>
+            </mcms-caselist>
+            <mcms-activitylist
+                name="acts"
+                selected-case="{{selectedCase}}"
+                selected-activities="{{selectedActivities}}">
+            </mcms-activitylist>
             <mcms-reportsummary 
                 name="reports">
             </mcms-reportsummary>
@@ -171,6 +175,7 @@ Example:
             return [
               {'name':'home', 'title':'Home'},
               {'name':'cases', 'title':'Cases'},
+              {'name':'acts', 'title':'Activities'},
               {'name':'reports', 'title':'Reports'}
             ];
           }
