@@ -9,43 +9,20 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
     :host {
       display: block;
       box-sizing: border-box;
-      font-family: 'Roboto', 'Noto', sans-serif;
-      font-size: 14px;
-      padding: 24px;
       background-color: gray;
-      margin: 10px;
-      border-radius: 10px;
       color: white;
     }
   </style>
 
   <template>
-    <h1>Activity List</h1>
+    <h3>{{selectedCase.caseID}}</h3>
     <template is="dom-repeat" 
         items="{{selectedActivities}}"
-        filter="_isDisplay"
+        filter="_hasCase"
         id="actlist">
 
-      <div>
-        <h4>{{item.activityType}} dated {{item.activityDate}}</h4> 
-        <!-- <hr>
-        <div>reported by {{item.author}} on {{item.timeStamp}}</div>
-        <br>
-        <div>{{item.actComment}}</div>
-        <div>{{item.notes}}</div>
-        <br>
-        <div id="meta" hidden vertical layout>
-          <span>Report Type:  {{item.reportType}}</span>
-          <span>Start Date: {{item.activityDate}}</span>
-          <span>End Date: {{item.endDate}}</span>
-          <span>Days: {{item.mediationDays}}</span>
-          <span>Carrier Reps: {{item.carrierReps}}</span>
-          <span>Organization Reps: {{item.orgReps}}</span>
-          <span>Location: {{item.location}}</span><br>
-          <span>Management Plan: {{item.managementPlan}}</span>
-          <br>  
-        </div> -->
-      </div>
+      <mcms-activity activity="{{item}}">
+      </mcms-activity>
 
 
 
@@ -68,12 +45,14 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
         }
       },
 
-      _isDisplay: function (item) {
-        return true;
+      redrawit: function () {
+        this.$.actlist.render();
       },
 
       _hasCase: function (item) {
+        // console.log("in _hasCase");
         var teststring = this.selectedCase.caseID;
+        // console.log("in _hasCase, " + teststring);
         if (teststring) {
           var testresult = false;
           var testObject = item.cases;
@@ -82,6 +61,9 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
               //The current property is not a direct property of p
               continue;
             }
+
+            // console.log(prop + ", " + teststring);
+
             if (testObject[prop].startsWith(teststring)) {
               testresult = true;
             }
@@ -89,7 +71,9 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
           return testresult;
         } else {
           return false;
+          // console.log("no teststring");
         }  
+        // return true;
       }
 
     });

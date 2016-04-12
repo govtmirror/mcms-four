@@ -1,0 +1,101 @@
+<!--
+@license
+Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
+-->
+
+<dom-module id="mcms-activity">
+
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      font-size: 14px;
+    }
+
+    .act {
+        padding: 2% 2% 2% 2%;
+        border-radius: 5px;
+        background-color: white;
+        margin: 2%;
+        color:black;
+        margin: 1em;
+      }
+      .yohide {
+        display: none;
+      }
+      #meta {
+        padding: 1em;
+        border-radius: 5px;
+        background-color: #ddd;
+        margin-top: 1em;
+      }
+      h4 {
+        color: blue;
+      }
+  </style>
+
+  <template>
+    
+
+    <div id="itself" class="act" >
+      <h4>{{activity.activityType}} dated {{activity.activityDate}}</h4> 
+      <hr>
+      <div>reported by {{activity.author}} on {{activity.timeStamp}}</div>
+      <br>
+      <div>{{activity.actComment}}</div>
+      <div>{{activity.notes}}</div>
+      <br>
+      <div id="meta" hidden$="{{_hideMe}}" >
+        <span>Report Type:  {{activity.reportType}}</span><br>
+        <span>Start Date: {{activity.activityDate}}</span><br>
+        <span>End Date: {{activity.endDate}}</span><br>
+        <span>Days: {{activity.mediationDays}}</span><br>
+        <span>Carrier Reps: {{activity.carrierReps}}</span><br>
+        <span>Organization Reps: {{activity.orgReps}}</span><br>
+        <span>Location: {{activity.location}}</span><br>
+        <span>Management Plan: {{activity.managementPlan}}</span><br>
+        <br>  
+      </div>
+
+      
+    </div> 
+
+
+
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'mcms-activity',
+
+      properties: {
+      
+        activity: {
+          type: Object,
+          value: function () {
+            return {};
+          }
+        },
+
+        _hideMe: {
+          type: Boolean,
+          value: true
+        }
+
+      },
+
+      ready: function () {
+        if (this.activity.activityType == "Mediation Report") {
+          // console.log("med-cs-activity, it is a mediator report");
+          this._hideMe = false;
+        } 
+      }
+
+    });
+
+  </script>
+</dom-module>

@@ -26,31 +26,16 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       width:350px;
     }
 
+    .narrowbtn {
+      display: none;
+    }
+
     .flex-horizontal {
       @apply(--layout-horizontal);
       @apply(--layout-center);
     }
     .flexchild {
       @apply(--layout-flex);
-    }
-
-    .flex-wrap {
-      @apply(--layout-horizontal);
-      @apply(--layout-wrap);
-      width: 200px;
-    }
-
-    .flex-horizontal-with-ratios {
-      @apply(--layout-horizontal);
-    }
-    .flexchild {
-      @apply(--layout-flex);
-    }
-    .flex2child {
-      @apply(--layout-flex-2);
-    }
-    .flex3child {
-      @apply(--layout-flex-3);
     }
 
     .caseitem {
@@ -79,6 +64,18 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       border-radius: 15px;
     }
 
+    @media (max-width: 580px) {
+      .mainlayout {
+        @apply(--layout-vertical);
+      }
+      .leftside {
+        width:100%;
+      }
+      .narrowbtn {
+        display: inline;
+      }
+    }
+
   </style>
 
   <template>
@@ -95,12 +92,18 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
                   on-tap="_doSearchToggle">
               </paper-icon-button>
               <div class="flexchild">Search Form</div>
+              <paper-icon-button
+                  class="narrowbtn"
+                  icon="{{_detailState}}"
+                  on-tap="_toggledetail">
+              </paper-icon-button>
 
               
             </div>
             <iron-collapse id="searchform">
               <hr>
               <paper-radio-button 
+                  checked
                   id="getOpen" >
                 Open
               </paper-radio-button>
@@ -141,7 +144,7 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
               </div>
             </iron-collapse>
           </div>
-          <div class="fit">
+          <div id="actualList" class="fit" hidden$="{{_hideActualList}}">
             <template is="dom-repeat" 
                 id="medcaselist"
                 items="{{caselist}}"
@@ -168,52 +171,6 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
                     
 
               </div>
-
-                <!-- <iron-collapse opened id="dtails">
-                <br>
-                  <div>
-                    <div class="bluecase flex-horizontal-with-ratios">
-                      <div class="flexchild">
-                        <span>Case Status:<span><br>
-                        <br>
-                        <span>Cumm. Days:<span><br>
-                        <span>Amendable Date:<span><br>
-                        <span># of Employees:</span><br>
-                        <span>Craft(s):</span>
-                      </div>
-                      <div class="flex2child">
-                        <span>&nbsp;{{item.caseState}}<span><br>
-                        <br>
-                        <span>&nbsp;{{item.cummDays}}<span><br>
-                        <span>&nbsp;{{item.amendableDate}}<span><br>
-                        <span>&nbsp;{{item.numberOfEmployees}}</span><br>
-                        <template is="dom-repeat" items="{{item.crafts}}">
-                          <div>{{item}}</div>
-                        </template>
-                      </div>
-                      <div class="flexchild">
-                        <span>Next Schedule:<span><br>
-                        <span>TA Date:<span><br>
-                        <span>new Amend Date:<span><br>
-                        <span>Ratification Date:<span><br>
-                        <span>Closed Date:<span><br>
-                      </div>
-                      <div class="flex2child">
-                        <span>&nbsp;{{item.scheduledDate}}<span><br>
-                        <span>&nbsp;{{item.taDate}}<span><br>
-                        <span>&nbsp;{{item.newAmendableDate}}<span><br>
-                        <span>&nbsp;{{item.ratifyDate}}<span><br>
-                        <span>&nbsp;{{item.closedDate}}<span><br>
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="bluecase">
-                    <b>Aged Case Comment:</b><br>
-                    {{item.agedCaseComment}}
-                    <br><br>
-                    </div>
-                  </div>
-                </core-collapse> -->
                 
             </template>
           </div>
@@ -250,6 +207,14 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         _toggleState: {
           type: String,
           value: "arrow-downward"
+        },
+        _detailState: {
+          type: String,
+          value: "description"
+        },
+        _hideActualList: {
+          type: Boolean,
+          value: false
         }
 
       },
@@ -301,6 +266,15 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           this._toggleState = "arrow-upward"
         } else {
           this._toggleState = "arrow-downward"
+        }
+      },
+      _toggledetail: function () {
+        if (this._detailState == "description") {
+          this._detailState = "list";
+          this._hideActualList = true;
+        } else {
+          this._detailState = "description";
+          this._hideActualList = false;
         }
       },
 
