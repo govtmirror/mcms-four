@@ -39,17 +39,17 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
     
 
     <div id="itself" class="act" >
-      <h4>{{activity.activityType}} dated {{activity.activityDate}}</h4> 
+      <h4>{{activity.activityType}} dated {{dateConvert(activity.activityDate)}}</h4> 
       <hr>
-      <div>reported by {{activity.author}} on {{activity.timeStamp}}</div>
+      <div>reported by {{activity.author}} on {{dateConvert(activity.timeStamp)}}</div>
       <br>
       <div>{{activity.actComment}}</div>
       <div>{{activity.notes}}</div>
       <br>
       <div id="meta" hidden$="{{_hideMe}}" >
         <span>Report Type:  {{activity.reportType}}</span><br>
-        <span>Start Date: {{activity.activityDate}}</span><br>
-        <span>End Date: {{activity.endDate}}</span><br>
+        <span>Start Date: {{dateConvert(activity.activityDate)}}</span><br>
+        <span>End Date: {{dateConvert(activity.endDate)}}</span><br>
         <span>Days: {{activity.mediationDays}}</span><br>
         <span>Carrier Reps: {{activity.carrierReps}}</span><br>
         <span>Organization Reps: {{activity.orgReps}}</span><br>
@@ -93,7 +93,16 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
           // console.log("med-cs-activity, it is a mediator report");
           this._hideMe = false;
         } 
-      }
+      },
+
+      dateConvert: function (stringint) {
+        if (stringint != "" && stringint != null){
+          var d = new Date(parseInt(stringint));
+          return d.toLocaleDateString();
+        } else {
+          return "n/a";
+        }
+      },
 
     });
 

@@ -19,6 +19,7 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
     <template is="dom-repeat" 
         items="{{selectedActivities}}"
         filter="_hasCase"
+        sort="_reverseSort"
         id="actlist">
 
       <mcms-activity activity="{{item}}">
@@ -74,6 +75,12 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
           // console.log("no teststring");
         }  
         // return true;
+      },
+
+      _reverseSort: function (a, b) {
+        var aa = parseInt(a.activityDate);
+        var bb = parseInt(b.activityDate);
+        return bb - aa;
       }
 
     });

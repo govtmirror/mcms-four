@@ -55,7 +55,11 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
     }
    
     .aaaa {
-      height:85vh;
+      height:25vh;
+    }
+
+    .bbb {
+      display:inline;
     }
 
     .bluecase {
@@ -144,12 +148,13 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
               </div>
             </iron-collapse>
           </div>
-          <div id="actualList" class="fit" hidden$="{{_hideActualList}}">
+          <!-- <div id="actualList" class="fit" hidden$="{{_hideActualList}}"> -->
+          <div id="actualList" class="">
             <template is="dom-repeat" 
                 id="medcaselist"
                 items="{{caselist}}"
                 filter="isDisplay">
-              <div on-tap="_itemtap" class="caseitem ">
+              <div on-tap="_itemtap" class="caseitem">
 
 
 
@@ -168,8 +173,6 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
                     <template is="dom-repeat" items="{{item.nmbMembers}}" as="poop">
                       {{poop.name}},&nbsp;
                     </template>
-                    
-
               </div>
                 
             </template>
@@ -215,6 +218,10 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         _hideActualList: {
           type: Boolean,
           value: false
+        },
+        _actualListClass: {
+          type: String,
+          value: "bbb"
         }
 
       },
@@ -257,7 +264,11 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         this.$.getOpen.checked = false;
         this.$.getTaed.checked = false;
         this.$.getClosed.checked = false;
-        alert("_doClearList");
+        this.$.casetest.value = "";
+        this.$.membertest.value = "";
+        this.$.carriertest.value = "";
+        this.$.orgtest.value = "";
+        // alert("_doClearList");
       },
 
       _doSearchToggle: function () {
@@ -271,10 +282,12 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       _toggledetail: function () {
         if (this._detailState == "description") {
           this._detailState = "list";
-          this._hideActualList = true;
+          // this._hideActualList = true;
+          this._actualListClass = "ccc"
         } else {
           this._detailState = "description";
-          this._hideActualList = false;
+          // this._hideActualList = false;
+          this._actualListClass = "bbb"
         }
       },
 
