@@ -26,6 +26,10 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       width:350px;
     }
 
+    .rght {
+      float: right;
+    }
+
     .narrowbtn {
       display: none;
     }
@@ -55,11 +59,11 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
     }
    
     .aaaa {
-      height:25vh;
+      height:85vh;
     }
 
-    .bbb {
-      display:inline;
+    .bbbb {
+      height:65px;
     }
 
     .bluecase {
@@ -86,19 +90,21 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 
   <div class="mainlayout">
     <div class="leftside">
-      <div class="aaaa">
+      <div id="searchDiv" class="aaaa">
         <paper-header-panel 
             mode="waterfall">
           <div class="listhead">
             <div class="flex-horizontal">
               <paper-icon-button
                   icon="{{_toggleState}}"
+                  disabled$="{{_toggleDisabled}}"
                   on-tap="_doSearchToggle">
               </paper-icon-button>
               <div class="flexchild">Search Form</div>
               <paper-icon-button
                   class="narrowbtn"
                   icon="{{_detailState}}"
+                  disabled$="{{_detailDisabled}}"
                   on-tap="_toggledetail">
               </paper-icon-button>
 
@@ -148,7 +154,6 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
               </div>
             </iron-collapse>
           </div>
-          <!-- <div id="actualList" class="fit" hidden$="{{_hideActualList}}"> -->
           <div id="actualList" class="">
             <template is="dom-repeat" 
                 id="medcaselist"
@@ -158,7 +163,9 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
 
 
 
-                    {{item.caseID}} {{item.caseSuffix}}, {{dateConvert(item.docketDate)}},<br>&nbsp;&nbsp;
+                    {{item.caseID}} {{item.caseSuffix}} 
+                    <span class="rght">Docketed {{dateConvert(item.docketDate)}}</span>
+                    <br>&nbsp;&nbsp;
                     
                     <template is="dom-repeat" items="{{item.carriers}}" as="piss">
                       {{piss}},&nbsp;
@@ -215,13 +222,13 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
           type: String,
           value: "description"
         },
-        _hideActualList: {
+        _toggleDisabled: {
           type: Boolean,
           value: false
         },
-        _actualListClass: {
-          type: String,
-          value: "bbb"
+        _detailDisabled: {
+          type: Boolean,
+          value: false
         }
 
       },
@@ -275,19 +282,23 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
         this.$.searchform.toggle();
         if (this.$.searchform.opened) {
           this._toggleState = "arrow-upward"
+          this._detailDisabled = true;
         } else {
           this._toggleState = "arrow-downward"
+          this._detailDisabled = false;
         }
       },
       _toggledetail: function () {
         if (this._detailState == "description") {
           this._detailState = "list";
-          // this._hideActualList = true;
-          this._actualListClass = "ccc"
+          this.toggleClass('aaaa', false, this.$.searchDiv);
+          this.toggleClass('bbbb', true, this.$.searchDiv);
+          this._toggleDisabled = true;
         } else {
           this._detailState = "description";
-          // this._hideActualList = false;
-          this._actualListClass = "bbb"
+          this.toggleClass('bbbb', false, this.$.searchDiv);
+          this.toggleClass('aaaa', true, this.$.searchDiv);
+          this._toggleDisabled = false;
         }
       },
 
@@ -303,10 +314,6 @@ Copyright (c) 2016 dean wagner wagner@nmb.gov. All rights reserved.
       },
 
       isDisplay: function (item) {
-        // console.log("display results = " + 
-        //   this._getState(item) + ", " + 
-        //   this._caseStartsWith(item) + ", " + 
-        //   this._hasMember(item)) ;
         return this._getState(item) && 
                this._caseStartsWith(item) &&
                this._hasMember(item) &&

@@ -50,7 +50,7 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
 
   <template>
       <div class="headerbox">
-        <div class="caseheader">{{selectedCase.caseID}} {{selectedCase.caseSuffix}}</div>
+        <div class="caseheader">{{_showCaseID(selectedCase.caseID)}} {{selectedCase.caseSuffix}}</div>
         <div>{{selectedCase.orgs}} - {{selectedCase.carriers}}</div>
         <div>{{selectedCase.crafts}} - {{selectedCase.numberOfEmployees}} emp.</div>
       </div>
@@ -59,7 +59,7 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
         <tr><td>Docket</td><td class="rightshift">[[dateConvert(selectedCase.docketDate)]]</td></tr>
         <tr><td>Cumm. Days</td><td class="rightshift">{{selectedCase.cummDays}}</td></tr>
         <tr><td>Amedable Date</td><td class="rightshift">[[dateConvert(selectedCase.amendableDate)]]</td></tr>
-        <tr><td>Scheduled</td><td class="rightshift">[[dateConvert(selectedCase.scheduledDate)]]</td></tr>
+        <tr><td>Next Sched. Date</td><td class="rightshift">[[dateConvert(selectedCase.scheduledDate)]]</td></tr>
         <tr><td>TA Date</td><td class="rightshift">[[dateConvert(selectedCase.taDate)]]</td></tr>
         <tr><td>Ratified</td><td class="rightshift">[[dateConvert(selectedCase.ratifyDate)]]</td></tr>
         <tr><td>New A. Date</td><td class="rightshift">[[dateConvert(selectedCase.newAmendableDate)]]</td></tr>
@@ -87,6 +87,18 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
           value: function () {
             return {};
           }
+        }
+      },
+
+      _showCaseID: function () {
+        if (this.selectedCase) {
+          if (this.selectedCase.hasOwnProperty('caseID')) {
+            return this.selectedCase.caseID;
+          } else {
+            return "no case selected"
+          }
+        } else {
+          return "no case selected"
         }
       },
 

@@ -8,26 +8,35 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
   <style>
     :host {
       display: block;
-      box-sizing: border-box;
-      background-color: gray;
-      color: white;
+      box-sizing: border-box;   
     }
+
+    .backlist {
+      @apply(--paper-font-display1);
+      color: var(--primary-text-color);
+      background-color: var(--light-primary-color);
+      margin:10px;
+      padding:10px;
+      border-radius: 10px; 
+    }
+
   </style>
 
   <template>
-    <h3>{{selectedCase.caseID}}</h3>
-    <template is="dom-repeat" 
-        items="{{selectedActivities}}"
-        filter="_hasCase"
-        sort="_reverseSort"
-        id="actlist">
 
-      <mcms-activity activity="{{item}}">
-      </mcms-activity>
+    <div class="backlist">
+      <h3>{{_showCaseID(selectedCase.caseID)}}</h3>
 
+      <template is="dom-repeat" 
+          items="{{selectedActivities}}"
+          filter="_hasCase"
+          sort="_reverseSort"
+          id="actlist">
+        <mcms-activity activity="{{item}}">
+        </mcms-activity>
+      </template>
 
-
-    </template>
+    </div>
   </template>
 
   <script>
@@ -51,30 +60,39 @@ Copyright (c) 2015 dean wagner wagner@nmb.gov. All rights reserved.
       },
 
       _hasCase: function (item) {
-        // console.log("in _hasCase");
-        var teststring = this.selectedCase.caseID;
-        // console.log("in _hasCase, " + teststring);
-        if (teststring) {
-          var testresult = false;
-          var testObject = item.cases;
-          for (var prop in testObject) {
-            if (!testObject.hasOwnProperty(prop)) {
-              //The current property is not a direct property of p
-              continue;
+        if (this.selectedCase != null){
+          var teststring = this.selectedCase.caseID;
+          if (teststring) {
+            var testresult = false;
+            var testObject = item.cases;
+            for (var prop in testObject) {
+              if (!testObject.hasOwnProperty(prop)) {
+                continue;
+              }
+              if (testObject[prop].startsWith(teststring)) {
+                testresult = true;
+              }
             }
-
-            // console.log(prop + ", " + teststring);
-
-            if (testObject[prop].startsWith(teststring)) {
-              testresult = true;
-            }
-          }
-          return testresult;
+            return testresult;
+          } else {
+            return false;
+          } 
         } else {
           return false;
-          // console.log("no teststring");
-        }  
-        // return true;
+        }
+        
+      },
+
+      _showCaseID: function () {
+        if (this.selectedCase) {
+          if (this.selectedCase.hasOwnProperty('caseID')) {
+            return this.selectedCase.caseID;
+          } else {
+            return "no case selected"
+          }
+        } else {
+          return "no case selected"
+        }
       },
 
       _reverseSort: function (a, b) {
